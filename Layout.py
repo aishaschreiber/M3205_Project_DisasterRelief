@@ -50,34 +50,39 @@ m.setObjective(
     GRB.MINIMIZE)
 
 # CONSTRAINTS
-### NAME = m.addConstr()
-### NAME = {s:
-#        m.addConstr()
-#        for s in S}
 
-# 2
+
+# Each demand point assigned to one TF
 TWO = {(s,m):
        m.addConstr(quicksum(X[s,i,m] for i in I[m]) == 1)
            for s in S for m in M[s]}
 
-# 3
+# Demand points only assigned to TFs that are open
 THREE = {(i,m,s):
        m.addConstr(X[i,m,s] <= Y[i,s])
        for i in I for m in M[s] for s in S}
 
-# 4
+# TF capacity is not violated
+# demand points that are opened * capacity consumption  of item l , is <= capacity of TF i 
 FOUR = {(i,s):
        m.addConstr(quicksum(u[l]*quicksum(d[m][l][s]*X[i,m,s] for m in M[s]) for l in L) <= K[i][T]*Y[i,s])
-           i in I for s in S}
+           for i in I for s in S}
 
-# 5 
-FIVE = 
+# Demand points are assigned to the closest TF 
+# ----??????????
+FIVE = {(i,m,s):
+        m.addConstr(quicksum(X[n,m,s] >= Y[i,s] for n in I[m] and delta[n][m] <= delta[i][m]))
+        for s in S for m in M[s] for i in I[m]}
 
-# 6
-SIX = 
+# Amount of item l transported from PF to TF in scenario S, is >= proportion of demand to be satisfied in SCW k 
+SIX = {(s,i,k,l):
+       m.addConstr(quicksum(F[j,i,l,s] for j in J[i][k]) >= r[k][l]*quicksum(d[m][l][s]*X[i,m,s] for m in M[s]))
+       for s in S for i in I for k in K for l in L}
 
-# 7
-SEVEN = 
+# capacity consumption of item l * amount of prepositioned inventory is <= capacity of TF
+SEVEN = {j:
+         m.addConstr(quicksum(u[l]*I[j,l] for l in L) <= quicksum(K[t][p]*Z[j,t] for t in T))
+                     for j in J}
 
 # 8
 EIGHT = 
