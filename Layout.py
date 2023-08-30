@@ -20,7 +20,7 @@ from gurobipy import *
 # u[l]	    Capacity consumption of item l
 # h[l]	    Acquisition, expected inventory holding and wastage costs cost of item l 
 # c[j][t]	    Fixed cost of PF at location j of size t
-# delta[i][m]	Distance between TF i in I and demand point m in M(s)
+# delta[i][m]	Distance between TF i in TF and demand point m in M(s)
 
 
 m = Model("Attempt1")
@@ -31,7 +31,7 @@ m = Model("Attempt1")
 X = {(i,m,s): m.addVar(vtype=GRB.BINARY) for s in S for i in TF for m in M[s]}
 
 # 1, if TF i is opened under scenario s
-Y = {(i,s): m.addVar(vtype=GRB.BINARY) for s in S for i in I}
+Y = {(i,s): m.addVar(vtype=GRB.BINARY) for s in S for i in TF}
 
 # amount of item l transported from PJ j to TF i under scenario s
 F = {(j,i,l,s): m.addVar() for s in S for j in PF for i in TF for l in L}
@@ -76,13 +76,13 @@ FIVE = {(i,m,s):
 
 # Amount of item l transported from PF to TF in scenario S, is >= proportion of demand to be satisfied in SCW k 
 SIX = {(s,i,k,l):
-       m.addConstr(quicksum(F[j,i,l,s] for j in J[i][k]) >= r[k][l]*quicksum(d[m][l][s]*X[i,m,s] for m in M[s]))
+       m.addConstr(quicksum(F[j,i,l,s] for j in PF[i][k]) >= r[k][l]*quicksum(d[m][l][s]*X[i,m,s] for m in M[s]))
        for s in S for i in TF for k in K for l in L}
 
 # capacity consumption of item l * amount of prepositioned inventory is <= capacity of TF
 SEVEN = {j:
          m.addConstr(quicksum(u[l]*I[j,l] for l in L) <= quicksum(K[t][p]*Z[j,t] for t in T))
-                     for j in J}
+                     for j in PF}
 
 # 8
 EIGHT = 
