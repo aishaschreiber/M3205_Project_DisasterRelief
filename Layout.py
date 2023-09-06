@@ -1,13 +1,17 @@
 from gurobipy import *
 
-#SETS
-# TF         Set of temporary facility (TF) locations
-# PF         Set of permanent facility (PF) locations
-# K         Set of service coverage windows
-# T         Set of PF sizes
-# S         Set of scenarios
-# L         Set of items
-# PF[i][k]       Set of PFs that can service TF i within SCW k  ( PFik⊆ PFik', for k<k' )
+#SETS   
+TF = range(76+1) # Set of temporary facility locations (aka 'I' in the paper)
+PF = range(34+1) # Set of permanent facility (PF) locations J (aka 'J' in the paper)
+K = range(2+1) # Set of service coverage windows
+T = range(1+1) # Set of PF sizes
+S = range(1+1) # Set of scenarios
+L = range(2+1) # Set of items
+# PF[i][k]  Set of PFs that can service TF i within SCW k  ( PFik ⊆ PFik', for k<k' )
+# i-k: list of PF locations separate by semicolons
+
+
+
 # M[s]	    Set of demand points under disaster scenario s
 # TF[m] in TF Set of TFs that are close enough to serve demand point m
 
@@ -84,24 +88,24 @@ SEVEN = {j:
          m.addConstr(quicksum(u[l]*I[j,l] for l in L) <= quicksum(K[t][p]*Z[j,t] for t in T))
                      for j in PF}
 
-# 8
-EIGHT = 
+# # 8
+# EIGHT = 
 
-# 9
-NINE = 
+# # 9
+# NINE = 
 
-# 10
-TEN = 
+# # 10
+# TEN = 
 
-# 11
-ELEVEN = 
+# # 11
+# ELEVEN = 
 
-# 12
-TWELVE = 
+# # 12
+# TWELVE = 
 
-# 13
-THIRTEEN = 
+# # 13
+# THIRTEEN = 
 
-# 14
-FOURTEEN = 
+# # 14
+# FOURTEEN = 
 
