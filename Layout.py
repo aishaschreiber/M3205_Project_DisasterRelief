@@ -11,7 +11,6 @@ L = range(2+1) # Set of items
 # i-k: list of PF locations separate by semicolons
 
 
-
 # M[s]	    Set of demand points under disaster scenario s
 # TF[m] in TF Set of TFs that are close enough to serve demand point m
 
