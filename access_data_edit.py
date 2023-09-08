@@ -65,7 +65,7 @@ L = range(get_set_size(start_indexes[5]))
 Set of PFs that can serve TF i within SCW k (J_ki ⊆ J_k'i , for k < k')
 Take the 16th-66th rows of the complete_data and put them into a dictoinary J_ik[(i,k)]"""
 
-J_ki = load_into_dict(start_indexes[6]+1, start_indexes[7], 'int')
+J_ik = load_into_dict(start_indexes[6]+1, start_indexes[7], 'int')
 
 """
 Set of demand points under disaster scenario s
@@ -144,7 +144,7 @@ data_sets = {
     'S': S, 
     # Set of items
     'L': L,
-    'PF_ki': J_ki,
+    'PF_ik': J_ik,
     'M_s': M_s,
     'TF_m': I_m,
     'D_mls': D_mls,
