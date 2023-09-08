@@ -49,7 +49,7 @@ m = Model("Attempt1")
 
 #VARIABLES
 # 1, if demand point m in assigned to TF i for scenario s
-# X = {(i,m,s): m.addVar(vtype=GRB.BINARY) for s in S for i in TF for m in M_s[s]}
+X = {(i,m,s): m.addVar(vtype=GRB.BINARY) for s in S for i in TF for m in M_s[s]}
 
 # 1, if TF i is opened under scenario s
 Y = {(i,s): m.addVar(vtype=GRB.BINARY) for s in S for i in TF}
