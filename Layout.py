@@ -50,6 +50,7 @@ m = Model("Attempt1")
 #VARIABLES
 # 1, if demand point m in assigned to TF i for scenario s
 # X = {(i,m,s): m.addVar(vtype=GRB.BINARY) for s in S for i in TF for m in M_s[s]}
+X = {(i,m,s): m.addVar(vtype=GRB.BINARY) for s in S for i in TF}
 
 # 1, if TF i is opened under scenario s
 Y = {(i,s): m.addVar(vtype=GRB.BINARY) for s in S for i in TF}
@@ -95,9 +96,13 @@ m.setObjective(
 #         m.addConstr(quicksum(X[n,m,s] >= Y[i,s] for n in TF_m[m] and delta_im[(n,m)][0] <= delta_im[(i,m)][0]))
 #         for s in S for m in M_s[s] for i in TF_m[m]}
 
-# # Amount of item l transported from PF to TF in scenario S, is >= proportion of demand to be satisfied in SCW k 
+# Amount of item l transported from PF to TF in scenario S, is >= proportion of demand to be satisfied in SCW k 
 # SIX = {(s,i,k,l):
 #         m.addConstr(quicksum(F[j,i,l,s] for j in PF_ik[(i,k)]) >= R_lk[(l,k)][0]*quicksum(D_mls[(m,l,s)][0]*X[i,m,s] for m in M_s[s]))
+#         for s in S for i in TF for k in K for l in L}
+    
+# SIX = {(s,i,k,l): 
+#         m.addConstr(quicksum(F[j,i,l,s] for j in PF_ik[(i,k)]) >= R_lk[(l,k)][0]*quicksum(D_mls[(M_s[s],l,s)][0]*X[i,M_s[s],s] for M_s[s] in M_s[s]))
 #         for s in S for i in TF for k in K for l in L}
 
 # capacity consumption of item l * amount of prepositioned inventory is <= capacity of TF
@@ -121,5 +126,5 @@ NINE = {j:
 # # THIRTEEN: Z is a binary variable
 # # FOURTEEN: I >= 0 variable
 
-m.optimize()
+# m.optimize()
 
