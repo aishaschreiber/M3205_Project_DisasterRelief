@@ -1,23 +1,23 @@
 import csv
 
-# Read in the data from csv and take each component and put it into a dictionary
+# Read in the data from csv and take each component and put it into a dictionary        
 complete_data = []
-with open("/Users/aishaschreiber/Documents/GitHub/M3205_Project_DisasterRelief/CLFDIP Model Data Generation Tool/Instances (Sets and Parameters)/Pr01_S2.txt", 'r') as csvfile:
-    reader = csv.reader(csvfile)
-    for row in reader:
-        complete_data.append(row)
+with open("/Users/aishaschreiber/Documents/GitHub/M3205_Project_DisasterRelief/CLFDIP Model Data Generation Tool/Instances (Sets and Parameters)/Pr01_S2.txt", 'r') as textfile:
+    for line in textfile:
+        complete_data.append(line.strip())  # Remove leading/trailing whitespace
+
 
 # Get the idex of all the lines in the complete_data that start with "(" because they are the start of a new set
 start_indexes = []
 for i in range(len(complete_data)):
     if str(complete_data[i]).find('(') != -1:
         start_indexes.append(i)
-
+        
 """
 Get size of set from row in complete_data
 """
 def get_set_size(row):
-    return int(str(complete_data[row+1][0]).split('*')[1])
+    return int(complete_data[row+1].split('*')[1])
 
 """
 Load the data from the complete_data into a dictionary
@@ -25,39 +25,42 @@ start: the row number of the start of the data
 end: the row number of the end of the data
 value_type: the type of the value in the dictionary (int or float)
 """
+
 def load_into_dict(start, end, value_type):
-    dict = {}
+    my_dict = {}
     for i in range(start, end):
-        [key, value]  = complete_data[i][0].split(': ')
+        line = complete_data[i]
+        key_str, value_str = line.split(': ')
         # Format key
-        key = key.split('-')
-        if len(key) == 1:
-            key = int(key[0])
+        key_parts = key_str.split('-')
+        if len(key_parts) == 1:
+            key = int(key_parts[0])
         else:
-            key = tuple([int(x) for x in key])
-        # Format value
-        value = value.split('; ')
-        if value_type == 'int':
-            value = [int(x) for x in value]
-        elif value_type == 'float':
-            value = [float(x) for x in value]
+            key = tuple(map(int, key_parts))
+        # Format value by splitting on semicolons
+        values = [float(val.replace(',', '.')) for val in value_str.split(';')]
+        # Convert value to a single element if there's only one element in the list
+        if len(values) == 1:
+            values = values[0]
         # Add to dictionary
-        dict[key] = value
-    return dict
+        my_dict[key] = values
+    return my_dict
+
+
 
 # Sets
 #Set of temporary facility (TF) locations
-I = range(get_set_size(start_indexes[0]))
+TF = range(get_set_size(start_indexes[0])+1)
 # Set of permanent facility (PF) locations
-J = range(get_set_size(start_indexes[1]))
+PF = range(get_set_size(start_indexes[1])+1)
 # Set of service coverage windows
-K = range(get_set_size(start_indexes[2]))
+K = range(get_set_size(start_indexes[2])+1)
 # Set of PF sizes
-T = range(get_set_size(start_indexes[3]))
+T = range(get_set_size(start_indexes[3])+1)
 # Set of scenarios
-S = range(get_set_size(start_indexes[4]))
+S = range(get_set_size(start_indexes[4])+1)
 # Set of items
-L = range(get_set_size(start_indexes[5]))
+L = range(get_set_size(start_indexes[5])+1)
 
 
 
@@ -65,7 +68,7 @@ L = range(get_set_size(start_indexes[5]))
 Set of PFs that can serve TF i within SCW k (J_ki ⊆ J_k'i , for k < k')
 Take the 16th-66th rows of the complete_data and put them into a dictoinary J_ik[(i,k)]"""
 
-J_ik = load_into_dict(start_indexes[6]+1, start_indexes[7], 'int')
+PF_ik = load_into_dict(start_indexes[6]+1, start_indexes[7], 'int')
 
 """
 Set of demand points under disaster scenario s
@@ -74,17 +77,17 @@ M_s = load_into_dict(start_indexes[7]+1, start_indexes[8], 'int')
 """
 Set of TFsthat are close enough to serve demand point m
 Take the 72nd-854th rows of the complete_data and put them into a dictoinary I_m[m]"""
-I_m = load_into_dict(start_indexes[8]+1, start_indexes[9], 'int')
+TF_m = load_into_dict(start_indexes[8]+1, start_indexes[9], 'int')
 
 """
 Demand of point m for item l under scenario s
 Take the 856th-3813th rows of the complete_data and put them into a dictoinary D_mls[(m,l,s)]"""
-D_mls = load_into_dict(start_indexes[9]+1, start_indexes[10], 'float')
+D_sml = load_into_dict(start_indexes[9]+1, start_indexes[10], 'float')
 
 """
 Proportion of demand for item l to be satisfied within service coverage window k
 Take the 3815th-3823th rows of the complete_data and put them into a dictoinary R_lk[(l,k)]"""
-R_lk = load_into_dict(start_indexes[10]+1, start_indexes[11], 'float')
+R_kl = load_into_dict(start_indexes[10]+1, start_indexes[11], 'float')
 
 """
 Capacity of a PF of size t
@@ -120,22 +123,22 @@ delta_im = load_into_dict(start_indexes[16]+1, start_indexes[17], 'int')
 Pairs of demand points m and temporary facilities i for each scenario s
 Take the 17195th-17197th rows of the complete_data and put them into a dictoinary C_s[s]"""
 # This needed a custom function because it is a list of tuples
-C_s = {}
-for i in range(start_indexes[17]+1, len(complete_data)):
-    [key, value]  = complete_data[i][0].split(': ')
-    # Format key
-    key = int(key)
-    # Format value
-    value = value.split('; ')
-    value = [(int(x.split('-')[0]), int(x.split('-')[1])) for x in value]
-    # Add to dictionary
-    C_s[key] = value
+# C_s = {}
+# for i in range(start_indexes[17]+1, len(complete_data)):
+#     [key, value]  = complete_data[i][0].split(': ')
+#     # Format key
+#     key = int(key)
+#     # Format value
+#     value = value.split('; ')
+#     value = [(int(x.split('-')[0]), int(x.split('-')[1])) for x in value]
+#     # Add to dictionary
+#     C_s[key] = value
 
 data_sets = {
     #Set of temporary facility (TF) locations
-    'TF': I,
+    'TF': TF,
     # Set of permanent facility (PF) locations
-    'PF': J,
+    'PF': PF,
     # Set of service coverage windows
     'K': K, 
     # Set of PF sizes
@@ -144,18 +147,18 @@ data_sets = {
     'S': S, 
     # Set of items
     'L': L,
-    'PF_ik': J_ik,
+    'PF_ik': PF_ik,
     'M_s': M_s,
-    'TF_m': I_m,
-    'D_mls': D_mls,
-    'R_lk': R_lk,
+    'TF_m': TF_m,
+    'D_sml': D_sml,
+    'R_kl': R_kl,
     'KP_t': KP_t,
     'KT_i': KT_i,
     'u_l': u_l,
     'h_l': h_l,
     'c_jt': c_jt,
     'delta_im': delta_im,
-    'C_s': C_s
+    # 'C_s': C_s
     }
 def get_data_sets():
     return data_sets
