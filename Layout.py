@@ -181,8 +181,9 @@ for i in TF:
     for j in PF:
         for t in T:
             if Z[j,t].x > 0.9:
-                if Y[i,s].x > 0.9:
-                    print('From',j,'To',i,[[round(F[(j,i,l,s)].x, 2) for l in L] for s in S])
+                for s in S:
+                    if Y[i,s].x > 0.9:
+                        print('From',j,'To',i,[[round(F[(j,i,l,s)].x, 2) for l in L] for s in S])
 
 print('Amount of each item at each TF in each scenario')
 for s in S:
