@@ -1,6 +1,7 @@
 from gurobipy import *
 import access_data_edit_2
 
+### ----- INSTANCE 2 ----- ###
 GET = access_data_edit_2.get_data_sets()
 #SETS   
 # TF = range(76+1) # Set of temporary facility locations (aka 'I' in the paper)
