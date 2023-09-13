@@ -39,9 +39,11 @@ KP_t = GET['KP_t']
 # dictoinary KT_i[i] Capacity of the TF (size T) at location i in TF(m) 
 KT_i = GET['KT_i']
 # dictoinary u_l[l]Capacity consumption of item l
-u_l = GET['u_l']
+# u_l = GET['u_l']
+u_l = {0: 15, 1: 32, 2: 2}
 # dictoinary h_l[l] Acquisition, expected inventory holding and wastage costs cost of item l 
-h_l = GET['h_l']
+# h_l = GET['h_l']
+h_l = {0: 1, 1: 5, 2: 2}
 # dictoinary c_jt[(j,t)] Fixed cost of PF at location j of size t
 c_jt = GET['c_jt']
 # dictoinary delta_im[(i,m)] Distance between TF i and demand point m in M_s(s)
@@ -73,7 +75,7 @@ I = {(j,l): LP.addVar() for j in PF for l in L}
 #OBJECTIVE
 LP.setObjective(
     quicksum(c_jt[(j,t)][0]*Z[j,t] for j in PF for t in T)+
-    quicksum(h_l[l][0]*I[j,l] for j in PF for l in L),
+    quicksum(h_l[l]*I[j,l] for j in PF for l in L),
     GRB.MINIMIZE)
 
 # # CONSTRAINTS
@@ -92,8 +94,10 @@ THREE = {(i,m,s):
 # TF capacity is not violated
 # demand points that are opened * capacity consumption  of item l , is <= capacity of TF i 
 FOUR = {(i,s):
-        LP.addConstr(quicksum(u_l[l][0]*quicksum(D_lms[(l,m,s)][0]*X[i,s,m] for m in M_s[s] if (l,m,s) in D_lms) for l in L) <= KT_i[i][0]*Y[i,s])
-            for i in TF for s in S}
+        LP.addConstr(quicksum(u_l[l]*quicksum(u_l[l]*D_lms[(l,m,s)][0]*X[i,s,m] 
+                    for m in M_s[s] if (l,m,s) in D_lms) for l in L) 
+                     <= KT_i[i][0]*Y[i,s])
+                    for i in TF for s in S}
 
 # Demand points are assigned to the closest TF 
 FIVE = {(i,s,m):
@@ -110,7 +114,7 @@ SIX = {(s,i,k,l):
 
 # capacity consumption of item l * amount of prepositioned inventory is <= capacity of TF
 SEVEN = {j:
-          LP.addConstr(quicksum(u_l[l][0]*I[j,l] for l in L) <= quicksum(KP_t[t][0]*Z[j,t] for t in T))
+          LP.addConstr(quicksum(u_l[l]*I[j,l] for l in L) <= quicksum(KP_t[t][0]*Z[j,t] for t in T))
                       for j in PF}
 
 # the amount of items that can be shipped from a PF under each scenario is limited by the prepositioned amount
@@ -129,5 +133,30 @@ NINE = {j:
 # # THIRTEEN: Z is a binary variable
 # # FOURTEEN: I >= 0 variable
 
+#VALID INEQUALITIES
+
+FIFTEEN = {(s,m):
+           LP.addConstr(quicksum(Y[i,s] for i in TF_m[m]) >=1)
+           for s in S for m in M_s[s]}
+   
+SIXTEEN = {(s,i):
+            LP.addConstr(quicksum(Z[j,t] for j in PF for t in T) >= Y[i,s])
+            for s in S for i in TF}
+   
+SEVENTEEN = {(s,l):
+             LP.addConstr(quicksum(I[j,l] for j in PF) 
+                          >= quicksum(D_lms[(l,m,s)][0]
+                        for m in M_s[s] if (l,m,s) in D_lms))
+            for s in S for l in L}
+
+
 LP.optimize()
+
+# for j in PF:
+#     for t in T:
+#         if Z[j,t].x == 0:
+#             print(Z[j,t].x)
+
+# for j in PF:
+#     print([I[j,l].x for l in L])
 
