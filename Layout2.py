@@ -1,26 +1,20 @@
 from gurobipy import *
-import access_data_edit
+import access_data_edit_2
 
-GET = access_data_edit.get_data_sets()
+GET = access_data_edit_2.get_data_sets()
 #SETS   
 # TF = range(76+1) # Set of temporary facility locations (aka 'I' in the paper)
-# TF = GET['TF']
-TF = range(76+1)
+TF = GET['TF']
 # PF = range(34+1) # Set of permanent facility (PF) locations J (aka 'J' in the paper)
-# PF = GET['PF']
-PF = range(34+1)
+PF = GET['PF']
 # K = range(2+1) # Set of service coverage windows
-# K = GET['K']
-K = range(2+1)
+K = GET['K']
 # T = range(1+1) # Set of PF sizes
-# T = GET['T']
-T = range(1+1)
+T = GET['T']
 # S = range(1+1) # Set of scenarios
-# S = GET['S']
-S = range(1+1)
+S = GET['S']
 # L = range(2+1) # Set of items
-# L = GET['L']
-L = range(2+1)
+L = GET['L']
 # dictionary J_ik[(i,k)] Set of PFs that can service TF i within SCW k  ( PFik ⊆ PFik', for k<k' )
 PF_ik = GET['PF_ik']
 
@@ -31,35 +25,24 @@ TF_m = GET['TF_m']
 
 #PARAMETERS
 # dictoinary D_mls[(m,l,s)] Demand of point m in Ms for item l in L under scenario s in S 
-D_sml = GET['D_mls']
+D_sml = GET['D_sml']
 # dictoinary R_lk[(l,k)] Proportion of demand for item l to be satisfied within service coverage window k in K
-R_ = GET['R_lk']
-R_kl = {(0,0): 0.33,
-        (0,1): 0.5,
-        (0,2): 0.2,
-        (1,0): 0.66,
-        (1,1): 0.8,
-        (1,2): 0.5,
-        (2,0): 1,
-        (2,1): 1,
-        (2,2): 1}
+R_kl = GET['R_kl']
 # dictoinary KP_t[t] Capacity of a PF of size t in T
 KP_t = GET['KP_t']
 # dictoinary KT_i[i] Capacity of the TF (size T) at location i in TF(m) 
 KT_i = GET['KT_i']
 # dictoinary u_l[l]Capacity consumption of item l
-# u_l = GET['u_l']
-u_l = {0: 0.15, 1: 0.032, 2: 2}
+u_l = GET['u_l']
 # dictoinary h_l[l] Acquisition, expected inventory holding and wastage costs cost of item l 
-# h_l = GET['h_l']
-h_l = {0: 0.1, 1: 5, 2: 2}
+h_l = GET['h_l']
 # dictoinary c_jt[(j,t)] Fixed cost of PF at location j of size t
 c_jt = GET['c_jt']
 # dictoinary delta_im[(i,m)] Distance between TF i and demand point m in M_s(s)
 delta_im = GET['delta_im']
 
 # dictoinary C_s[s]
-C_s = GET['C_s']
+# C_s = GET['C_s']
 
 
 LP = Model("Attempt1")
@@ -83,7 +66,7 @@ I = {(j,l): LP.addVar() for j in PF for l in L}
 
 #OBJECTIVE
 LP.setObjective(
-    quicksum(c_jt[(j,t)][0]*Z[j,t] for j in PF for t in T)+
+    quicksum(c_jt[(j,t)]*Z[j,t] for j in PF for t in T)+
     quicksum(h_l[l]*I[j,l] for j in PF for l in L),
     GRB.MINIMIZE)
 
@@ -103,27 +86,27 @@ THREE = {(i,m,s):
 # TF capacity is not violated
 # demand points that are opened * capacity consumption  of item l , is <= capacity of TF i 
 FOUR = {(i,s):
-        LP.addConstr(quicksum(u_l[l]*quicksum(u_l[l]*D_sml[(s,m,l)][0]*X[i,s,m] 
+        LP.addConstr(quicksum(u_l[l]*quicksum(u_l[l]*D_sml[(s,m,l)]*X[i,s,m] 
                     for m in M_s[s] if (s,m,l) in D_sml) for l in L) 
-                     <= KT_i[i][0]*Y[i,s])
+                      <= KT_i[i]*Y[i,s])
                     for i in TF for s in S}
 
 # Demand points are assigned to the closest TF 
 FIVE = {(i,s,m):
         LP.addConstr(quicksum(X[n,s,m] for n in TF_m[m] 
-        if delta_im[(n,m)][0] <= delta_im[(i,m)][0]) >= Y[i,s])
+        if delta_im[(n,m)] <= delta_im[(i,m)]) >= Y[i,s])
         for s in S for m in M_s[s] for i in TF_m[m]}
 
 # Amount of item l transported from PF to TF in scenario S, is >= proportion of demand to be satisfied in SCW k 
 SIX = {(s,i,k,l):
         LP.addConstr(quicksum(F[j,i,l,s] for j in PF_ik[(i,k)])
-        >= R_kl[(k,l)]*quicksum(D_sml[(s,m,l)][0]*X[i,s,m] for m in M_s[s] if (s,m,l) in D_sml))
+        >= R_kl[(k,l)]*quicksum(D_sml[(s,m,l)]*X[i,s,m] for m in M_s[s] if (s,m,l) in D_sml))
         for s in S for i in TF for k in K for l in L}
 
 
 # capacity consumption of item l * amount of prepositioned inventory is <= capacity of TF
 SEVEN = {j:
-          LP.addConstr(quicksum(u_l[l]*I[j,l] for l in L) <= quicksum(KP_t[t][0]*Z[j,t] for t in T))
+          LP.addConstr(quicksum(u_l[l]*I[j,l] for l in L) <= quicksum(KP_t[t]*Z[j,t] for t in T))
                       for j in PF}
 
 # the amount of items that can be shipped from a PF under each scenario is limited by the prepositioned amount
@@ -145,16 +128,16 @@ NINE = {j:
 #VALID INEQUALITIES
 
 FIFTEEN = {(s,m):
-           LP.addConstr(quicksum(Y[i,s] for i in TF_m[m]) >=1)
-           for s in S for m in M_s[s]}
+            LP.addConstr(quicksum(Y[i,s] for i in TF_m[m]) >=1)
+            for s in S for m in M_s[s]}
    
 SIXTEEN = {(s,i):
             LP.addConstr(quicksum(Z[j,t] for j in PF for t in T) >= Y[i,s])
             for s in S for i in TF}
    
 SEVENTEEN = {(s,l):
-             LP.addConstr(quicksum(I[j,l] for j in PF) 
-                          >= quicksum(D_sml[(s,m,l)][0]
+              LP.addConstr(quicksum(I[j,l] for j in PF) 
+                          >= quicksum(D_sml[(s,m,l)]
                         for m in M_s[s] if (s,m,l) in D_sml))
             for s in S for l in L}
 
@@ -193,6 +176,6 @@ for s in S:
 print('Demand for each scenario and each item')
 for s in S:
     for l in L:
-        print(s,l,sum(D_sml[(s,m,l)][0] for m in M_s[s]))
+        print(s,l,sum(D_sml[(s,m,l)] for m in M_s[s]))
 
 
