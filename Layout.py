@@ -31,19 +31,28 @@ TF_m = GET['TF_m']
 
 #PARAMETERS
 # dictoinary D_mls[(m,l,s)] Demand of point m in Ms for item l in L under scenario s in S 
-D_lms = GET['D_mls']
+D_sml = GET['D_mls']
 # dictoinary R_lk[(l,k)] Proportion of demand for item l to be satisfied within service coverage window k in K
-R_lk = GET['R_lk']
+# R_kl = GET['R_lk']
+R_kl = {(0,0): 0.33,
+        (0,1): 0.5,
+        (0,2): 0.2,
+        (1,0): 0.66,
+        (1,1): 0.8,
+        (1,2): 0.5,
+        (2,0): 1,
+        (2,1): 1,
+        (2,2): 1}
 # dictoinary KP_t[t] Capacity of a PF of size t in T
 KP_t = GET['KP_t']
 # dictoinary KT_i[i] Capacity of the TF (size T) at location i in TF(m) 
 KT_i = GET['KT_i']
 # dictoinary u_l[l]Capacity consumption of item l
 # u_l = GET['u_l']
-u_l = {0: 15, 1: 32, 2: 2}
+u_l = {0: 0.15, 1: 0.032, 2: 2}
 # dictoinary h_l[l] Acquisition, expected inventory holding and wastage costs cost of item l 
 # h_l = GET['h_l']
-h_l = {0: 1, 1: 5, 2: 2}
+h_l = {0: 0.1, 1: 5, 2: 2}
 # dictoinary c_jt[(j,t)] Fixed cost of PF at location j of size t
 c_jt = GET['c_jt']
 # dictoinary delta_im[(i,m)] Distance between TF i and demand point m in M_s(s)
@@ -94,8 +103,8 @@ THREE = {(i,m,s):
 # TF capacity is not violated
 # demand points that are opened * capacity consumption  of item l , is <= capacity of TF i 
 FOUR = {(i,s):
-        LP.addConstr(quicksum(u_l[l]*quicksum(u_l[l]*D_lms[(l,m,s)][0]*X[i,s,m] 
-                    for m in M_s[s] if (l,m,s) in D_lms) for l in L) 
+        LP.addConstr(quicksum(u_l[l]*quicksum(u_l[l]*D_sml[(s,m,l)][0]*X[i,s,m] 
+                    for m in M_s[s] if (s,m,l) in D_sml) for l in L) 
                      <= KT_i[i][0]*Y[i,s])
                     for i in TF for s in S}
 
@@ -108,7 +117,7 @@ FIVE = {(i,s,m):
 # Amount of item l transported from PF to TF in scenario S, is >= proportion of demand to be satisfied in SCW k 
 SIX = {(s,i,k,l):
         LP.addConstr(quicksum(F[j,i,l,s] for j in PF_ik[(i,k)])
-        >= R_lk[(l,k)][0]*quicksum(D_lms[(l,m,s)][0]*X[i,s,m] for m in M_s[s] if (l,m,s) in D_lms))
+        >= R_kl[(k,l)]*quicksum(D_sml[(s,m,l)][0]*X[i,s,m] for m in M_s[s] if (s,m,l) in D_sml))
         for s in S for i in TF for k in K for l in L}
 
 
@@ -145,18 +154,44 @@ SIXTEEN = {(s,i):
    
 SEVENTEEN = {(s,l):
              LP.addConstr(quicksum(I[j,l] for j in PF) 
-                          >= quicksum(D_lms[(l,m,s)][0]
-                        for m in M_s[s] if (l,m,s) in D_lms))
+                          >= quicksum(D_sml[(s,m,l)][0]
+                        for m in M_s[s] if (s,m,l) in D_sml))
             for s in S for l in L}
 
 
 LP.optimize()
 
-# for j in PF:
-#     for t in T:
-#         if Z[j,t].x == 0:
-#             print(Z[j,t].x)
+print('PFs that are open')
+for j in PF:
+    for t in T:
+        if Z[j,t].x > 0.9:
+            print(Z[j,t].x)
 
-# for j in PF:
-#     print([I[j,l].x for l in L])
+print('TFs that are open')
+for i in TF:
+    print([Y[i,s].x for s in S])
+            
+for j in PF:
+    for t in T:
+        if Z[j,t].x > 0.9:
+            print('Item amount at PF',j, [I[j,l].x for l in L])
+
+print('Amount we are delivering to TF in each scenario')
+for i in TF:
+    for j in PF:
+        for t in T:
+            if Z[j,t].x > 0.9:
+                if Y[i,s].x > 0.9:
+                    print('From',j,'To',i,[[round(F[(j,i,l,s)].x, 2) for l in L] for s in S])
+
+print('Amount of each item at each TF in each scenario')
+for s in S:
+    for l in L:
+        print(s,l,sum(F[(j,i,l,s)].x for i in TF for j in PF))
+   
+print('Demand for each scenario and each item')
+for s in S:
+    for l in L:
+        print(s,l,sum(D_sml[(s,m,l)][0] for m in M_s[s]))
+
 
