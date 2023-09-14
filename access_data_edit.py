@@ -3,7 +3,7 @@ import csv
 ### ----- INSTANCE 2 ----- ###
 # Read in the data from csv and take each component and put it into a dictionary        
 complete_data = []
-with open("/Users/aishaschreiber/Documents/GitHub/M3205_Project_DisasterRelief/CLFDIP Model Data Generation Tool/Instances (Sets and Parameters)/Pr01_S3.txt", 'r') as textfile:
+with open("/Users/aishaschreiber/Documents/GitHub/M3205_Project_DisasterRelief/CLFDIP Model Data Generation Tool/Instances (Sets and Parameters)/Pr02_S4.txt", 'r') as textfile:
     for line in textfile:
         complete_data.append(line.strip())  # Remove leading/trailing whitespace
 
