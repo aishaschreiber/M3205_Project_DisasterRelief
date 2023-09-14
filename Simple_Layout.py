@@ -1,47 +1,48 @@
 from gurobipy import *
-import access_data_edit
+import access_data_edit_2
 
-GET = access_data_edit.get_data_sets()
+### ----- INSTANCE 2 ----- ###
+GET = access_data_edit_2.get_data_sets()
 #SETS   
-# TF = range(76+1) # Set of temporary facility locations (aka 'I' in the paper)
+# Set of temporary facility locations (aka 'I' in the paper)
 TF = GET['TF']
-# PF = range(34+1) # Set of permanent facility (PF) locations J (aka 'J' in the paper)
+# Set of permanent facility (PF) locations J (aka 'J' in the paper)
 PF = GET['PF']
-# K = range(2+1) # Set of service coverage windows
+# Set of service coverage windows
 K = GET['K']
-# T = range(1+1) # Set of PF sizes
+# Set of PF sizes
 T = GET['T']
-# S = range(1+1) # Set of scenarios
+# Set of scenarios
 S = GET['S']
-# L = range(2+1) # Set of items
+# Set of items
 L = GET['L']
-# dictionary J_ik[(i,k)] Set of PFs that can service TF i within SCW k  ( PFik ⊆ PFik', for k<k' )
+# Set of PFs that can service TF i within SCW k  ( PFik ⊆ PFik', for k<k' )
 PF_ik = GET['PF_ik']
 
-# dictionary M_s[s] Set of demand points under disaster scenario s
+# Set of demand points under disaster scenario s
 M_s = GET['M_s']
-# dictionary I_m[m]: Set of TFs that are close enough to serve demand point m
+# Set of TFs that are close enough to serve demand point m
 TF_m = GET['TF_m']
 
 #PARAMETERS
-# dictoinary D_mls[(m,l,s)] Demand of point m in Ms for item l in L under scenario s in S 
+# Demand of point m in Ms for item l in L under scenario s in S 
 D_sml = GET['D_sml']
-# dictoinary R_lk[(l,k)] Proportion of demand for item l to be satisfied within service coverage window k in K
+# Proportion of demand for item l to be satisfied within service coverage window k in K
 R_kl = GET['R_kl']
-# dictoinary KP_t[t] Capacity of a PF of size t in T
+# Capacity of a PF of size t in T
 KP_t = GET['KP_t']
-# dictoinary KT_i[i] Capacity of the TF (size T) at location i in TF(m) 
+# Capacity of the TF (size T) at location i in TF(m) 
 KT_i = GET['KT_i']
-# dictoinary u_l[l]Capacity consumption of item l
+# Capacity consumption of item l
 u_l = GET['u_l']
-# dictoinary h_l[l] Acquisition, expected inventory holding and wastage costs cost of item l 
+# Acquisition, expected inventory holding and wastage costs cost of item l 
 h_l = GET['h_l']
-# dictoinary c_jt[(j,t)] Fixed cost of PF at location j of size t
+# Fixed cost of PF at location j of size t
 c_jt = GET['c_jt']
-# dictoinary delta_im[(i,m)] Distance between TF i and demand point m in M_s(s)
+# Distance between TF i and demand point m in M_s(s)
 delta_im = GET['delta_im']
 
-# dictoinary C_s[s]
+# C_s[s]
 # C_s = GET['C_s']
 
 
@@ -132,7 +133,7 @@ FIFTEEN = {(s,m):
             for s in S for m in M_s[s]}
    
 SIXTEEN = {(s,i):
-            LP.addConstr(quicksum(Z[j,t] for j in PF for t in T) >= Y[i,s])
+            LP.addConstr(quicksum(Z[j,t] for j in PF_ik[(i,1)] for t in T) >= Y[i,s])
             for s in S for i in TF}
    
 SEVENTEEN = {(s,l):
@@ -149,33 +150,34 @@ for j in PF:
     for t in T:
         if Z[j,t].x > 0.9:
             print(Z[j,t].x)
-
-print('TFs that are open')
-for i in TF:
-    print([Y[i,s].x for s in S])
             
-for j in PF:
-    for t in T:
-        if Z[j,t].x > 0.9:
-            print('Item amount at PF',j, [I[j,l].x for l in L])
-
-print('Amount we are delivering to TF in each scenario')
-for i in TF:
-    for j in PF:
-        for t in T:
-            if Z[j,t].x > 0.9:
-                for s in S:
-                    if Y[i,s].x > 0.9:
-                        print('From',j,'To',i,[[round(F[(j,i,l,s)].x, 2) for l in L] for s in S])
-
-print('Amount of each item at each TF in each scenario')
+print('Total amount of each item across all TFs in each scenario')
 for s in S:
-    for l in L:
-        print(s,l,sum(F[(j,i,l,s)].x for i in TF for j in PF))
+    print('Scen',s,[sum(F[(j,i,l,s)].x for i in TF for j in PF) for l in L])
    
-print('Demand for each scenario and each item')
+
+print('Demand of each item for each scenario')
 for s in S:
-    for l in L:
-        print(s,l,sum(D_sml[(s,m,l)] for m in M_s[s]))
+    print('Scen',s,[sum(D_sml[(s,m,l)] for m in M_s[s]) for l in L])
+
+
+# print('TFs that are open')
+# for i in TF:
+#     print([Y[i,s].x for s in S])
+            
+# for j in PF:
+#     for t in T:
+#         if Z[j,t].x > 0.9:
+#             print('Item amount at PF',j, [I[j,l].x for l in L])
+
+# print('Amount we are delivering to TF in each scenario')
+# for i in TF:
+#     for j in PF:
+#         for t in T:
+#             if Z[j,t].x > 0.9:
+#                 for s in S:
+#                     if Y[i,s].x > 0.9:
+#                         print('From',j,'To',i,[[round(F[(j,i,l,s)].x, 2) for l in L] for s in S])
+
 
 
