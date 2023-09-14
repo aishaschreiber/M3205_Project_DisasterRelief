@@ -133,7 +133,7 @@ FIFTEEN = {(s,m):
             for s in S for m in M_s[s]}
    
 SIXTEEN = {(s,i):
-            LP.addConstr(quicksum(Z[j,t] for j in PF for t in T) >= Y[i,s])
+            LP.addConstr(quicksum(Z[j,t] for j in PF_ik[(i,1)] for t in T) >= Y[i,s])
             for s in S for i in TF}
    
 SEVENTEEN = {(s,l):
@@ -145,38 +145,38 @@ SEVENTEEN = {(s,l):
 
 LP.optimize()
 
-print('PFs that are open')
-for j in PF:
-    for t in T:
-        if Z[j,t].x > 0.9:
-            print(Z[j,t].x)
+# print('PFs that are open')
+# for j in PF:
+#     for t in T:
+#         if Z[j,t].x > 0.9:
+#             print(Z[j,t].x)
 
-print('TFs that are open')
-for i in TF:
-    print([Y[i,s].x for s in S])
+# print('TFs that are open')
+# for i in TF:
+#     print([Y[i,s].x for s in S])
             
-for j in PF:
-    for t in T:
-        if Z[j,t].x > 0.9:
-            print('Item amount at PF',j, [I[j,l].x for l in L])
+# for j in PF:
+#     for t in T:
+#         if Z[j,t].x > 0.9:
+#             print('Item amount at PF',j, [I[j,l].x for l in L])
 
-print('Amount we are delivering to TF in each scenario')
-for i in TF:
-    for j in PF:
-        for t in T:
-            if Z[j,t].x > 0.9:
-                for s in S:
-                    if Y[i,s].x > 0.9:
-                        print('From',j,'To',i,[[round(F[(j,i,l,s)].x, 2) for l in L] for s in S])
+# print('Amount we are delivering to TF in each scenario')
+# for i in TF:
+#     for j in PF:
+#         for t in T:
+#             if Z[j,t].x > 0.9:
+#                 for s in S:
+#                     if Y[i,s].x > 0.9:
+#                         print('From',j,'To',i,[[round(F[(j,i,l,s)].x, 2) for l in L] for s in S])
 
-print('Amount of each item at each TF in each scenario')
-for s in S:
-    for l in L:
-        print(s,l,sum(F[(j,i,l,s)].x for i in TF for j in PF))
+# print('Amount of each item at each TF in each scenario')
+# for s in S:
+#     for l in L:
+#         print(s,l,sum(F[(j,i,l,s)].x for i in TF for j in PF))
    
-print('Demand for each scenario and each item')
-for s in S:
-    for l in L:
-        print(s,l,sum(D_sml[(s,m,l)] for m in M_s[s]))
+# print('Demand for each scenario and each item')
+# for s in S:
+#     for l in L:
+#         print(s,l,sum(D_sml[(s,m,l)] for m in M_s[s]))
 
 
