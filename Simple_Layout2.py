@@ -145,11 +145,11 @@ SEVENTEEN = {(s,l):
 
 LP.optimize()
 
-# print('PFs that are open')
-# for j in PF:
-#     for t in T:
-#         if Z[j,t].x > 0.9:
-#             print(Z[j,t].x)
+print('PFs that are open')
+for j in PF:
+    for t in T:
+        if Z[j,t].x > 0.9:
+            print(Z[j,t].x)
 
 # print('TFs that are open')
 # for i in TF:
@@ -169,14 +169,13 @@ LP.optimize()
 #                     if Y[i,s].x > 0.9:
 #                         print('From',j,'To',i,[[round(F[(j,i,l,s)].x, 2) for l in L] for s in S])
 
-# print('Amount of each item at each TF in each scenario')
-# for s in S:
-#     for l in L:
-#         print(s,l,sum(F[(j,i,l,s)].x for i in TF for j in PF))
+print('Total amount of each item across all TFs in each scenario')
+for s in S:
+    print('Scen',s,[sum(F[(j,i,l,s)].x for i in TF for j in PF) for l in L])
    
-# print('Demand for each scenario and each item')
-# for s in S:
-#     for l in L:
-#         print(s,l,sum(D_sml[(s,m,l)] for m in M_s[s]))
+
+print('Demand of each item for each scenario')
+for s in S:
+    print('Scen',s,[sum(D_sml[(s,m,l)] for m in M_s[s]) for l in L])
 
 
