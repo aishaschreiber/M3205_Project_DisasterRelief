@@ -1,8 +1,8 @@
 from gurobipy import *
-import access_data_edit_2
+import access_data_edit
 
 ### ----- INSTANCE 2 ----- ###
-GET = access_data_edit_2.get_data_sets()
+GET = access_data_edit.get_data_sets()
 #SETS   
 # Set of temporary facility locations (aka 'I' in the paper)
 TF = GET['TF']
@@ -153,7 +153,7 @@ for j in PF:
             
 print('Total amount of each item across all TFs in each scenario')
 for s in S:
-    print('Scen',s,[sum(F[(j,i,l,s)].x for i in TF for j in PF) for l in L])
+    print('Scen',s,[round(sum(F[(j,i,l,s)].x for i in TF for j in PF),2) for l in L])
    
 
 print('Demand of each item for each scenario')
