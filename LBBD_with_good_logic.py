@@ -238,13 +238,16 @@ for kk in range(10):
             if ReducedCSP.status == GRB.INFEASIBLE:
                 LIPMP.addConstr(quicksum(Y[p,s] for p in P2)>= Y[i,s] for s in S_d for i in P1[s]) #LBBD Cut 
                 CutsAdded +=1
-        else:
-            for l in L:
-                FDSP.optimize()
-                if FDSP.status == GRB.INFEASIBLE:
-                    LIPMP.addConstr() ## Duality cut (UP)
-                    CutsAdded +=1
+
+        for l in L:
+            FDSP.optimize()
+            if FDSP.status == GRB.INFEASIBLE:
+                LIPMP.addConstr() ## Duality cut (UP)
+                CutsAdded +=1
     if CutsAdded == 0:
         break
+    
+
+
 
 
