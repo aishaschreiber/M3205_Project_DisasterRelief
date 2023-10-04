@@ -187,22 +187,22 @@ for s in S:
 Kd = {} # where Kd is the remaining capacity of Tf i
 
 # Calculate the initial capacity at a TF
-for i in TF:
-    Kd[i] = KT_i[i] 
-# Calculate the demand at the TF according to if the demand point m is assigned there from the CSP problem
-for i in TF:    
-    for m in M_s[s]:
-        if X[i,m].x > 0.9:
-            demand_at_m = sum(D_sml[(s,m,l)] for l in L)
-# Calculate the remaining capacity at the TF
-            Kd[i] -= demand_at_m
+# for i in TF:
+#     Kd[i] = KT_i[i] 
+# # Calculate the demand at the TF according to if the demand point m is assigned there from the CSP problem
+# for i in TF:    
+#     for m in M_s[s]:
+#         if X[i,m].x > 0.9:
+#             demand_at_m = sum(D_sml[(s,m,l)] for l in L)
+# # Calculate the remaining capacity at the TF
+#             Kd[i] -= demand_at_m
 
 
 
 
-# ReducedCSP = Model("CheckForAlternative")
+ReducedCSP = Model("CheckForAlternative")
 
-# X = {(i,m): ReducedCSP.addVar(vtype=GRB.BINARY) for i in TF for m in M_s[s]}
+Xd = {(i,m): ReducedCSP.addVar(vtype=GRB.BINARY) for m in Md_s[s] for i in TFd_sm[s][m]}
 
 # #No objective 
 
