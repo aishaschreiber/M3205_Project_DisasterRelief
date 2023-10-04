@@ -137,59 +137,59 @@ TWENTY = {i:
                         <= KT_i[i] * Y[i,s].x) 
             for i in TF}
 
-CSP.optimize()
+# CSP.optimize()
 
 ##################################
 ##### Reduced CSP SUB-PROBLEM ####
 ##################################
 #It is equvalent to CSP after fixing the values of the X variables for which a unique closest TF exist.
 
-# # Dictionary of demand points with multiple closest TFs
-# Md_s = {}
-# # Dictionary of TFs that are the same distance from a demand point m (alternatives)
-# TFd_sm = {}
-# # For each scenario s in S
-# for s in S:
-#     multiples = []
-#     # For each demand point m in M_s[s]
-#     for m in M_s[s]:
-#         # Find the closest distance
-#         closest_distance = 1000000
-#         # For each TF i in I_m[m]
-#         for i in TF_m[m]:
-#             if delta_im[(i,m)] < closest_distance:
-#                 closest_distance = delta_im[(i,m)]
-#         # Find the TFs that are that distance away
-#         closest_TFs = []
-#         # For each TF i in I_m[m]
-#         for i in TF_m[m]:
-#             if delta_im[(i,m)] == closest_distance:
-#                 closest_TFs.append(i)
-#         # Add to dictionary
-#         TFd_sm[(s,m)] = closest_TFs
-#         if len(closest_TFs) > 1:
-#             multiples.append(m)
-#     Md_s[s] = multiples
+# Dictionary of demand points with multiple closest TFs
+Md_s = {}
+# Dictionary of TFs that are the same distance from a demand point m (alternatives)
+TFd_sm = {}
+# For each scenario s in S
+for s in S:
+    multiples = []
+    # For each demand point m in M_s[s]
+    for m in M_s[s]:
+        # Find the closest distance
+        closest_distance = 1000000
+        # For each TF i in I_m[m]
+        for i in TF_m[m]:
+            if delta_im[(i,m)] < closest_distance:
+                closest_distance = delta_im[(i,m)]
+        # Find the TFs that are that distance away
+        closest_TFs = []
+        # For each TF i in I_m[m]
+        for i in TF_m[m]:
+            if delta_im[(i,m)] == closest_distance:
+                closest_TFs.append(i)
+        # Add to dictionary
+        TFd_sm[(s,m)] = closest_TFs
+        if len(closest_TFs) > 1:
+            multiples.append(m)
+    Md_s[s] = multiples
 
-# # Kd_si # The remaining capacity of TF i after assigning the demand points to this TF
-# # Need to know which demands points were assigned to which TF
-# # for example Kd_si = {1: 45, 2, 62} where 1 and 2 are TFs and 46 62 are there respective remaining capacities
+# Kd_si # The remaining capacity of TF i after assigning the demand points to this TF
+# Need to know which demands points were assigned to which TF
+# for example Kd_si = {1: 45, 2, 62} where 1 and 2 are TFs and 46 62 are there respective remaining capacities
 
-# # Dictionary of TFs and their remaining capacities (given that the previous demand points are assigned)
-# Kd_si = {}
-# for s in S:
-#     for m in M_s[s]:
-#         for i in TF:
-#             #if demand point m is assigned to TF i
-#             if X[i,m].x > 0.9:
-#                 #then sum up the demand at that TF
-#                 demand_at_TF[i] = sum(D_sml[(s,m,l)] for l in L)
-#                 #find remaining demand
-#                 remaining_demand = []
-#                 amount = KT_i[i] - demand_at_TF[i]
-#                 remaining_demand.append(amount)
-#             # Add to dictionary
-#             KD_si[(s,i)] = remaining_demand
+# Dictionary of TFs and their remaining capacities (given that the previous demand points are assigned)
+Kd_si = {}
+for s in S:
+    for m in M_s[s]:
+        for i in TFd_sm:
+            #if demand point m is assigned to TF i
+            if X[i,m].x > 0.9:
+                #then sum up the demand at that TF
+                demand_at_TF[i] = sum(D_sml[(s,m,l)] for l in L)
+                #find remaining demand
+                remaining_demand = []
+                amount = KT_i[i] - demand_at_TF[i]
+                remaining_demand.append(amount)
+            # Add to dictionary
+            KD_si[(s,i)] = remaining_demand
     
 
 # ReducedCSP = Model("CheckForAlternative")
