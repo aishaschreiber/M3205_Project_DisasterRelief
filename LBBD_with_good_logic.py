@@ -130,25 +130,26 @@ LIPMP.optimize()
 #######################################
 
 CSP = Model("Clustering Subproblem") #####
+s =0 
 
 #Variables
-X = {(i,m,s): CSP.addVar(vtype=GRB.BINARY) for s in S for i in TF for m in M_s[s]}
+X = {(i,m): CSP.addVar(vtype=GRB.BINARY) for i in TF for m in M_s[s]}
 
 #No Objective, Just feasible Solution
 
 AssignEachDemand = {m:
-                    CSP.addConstr(quicksum(X[i,m,s] for i in TF_m[m]) ==1)
+                    CSP.addConstr(quicksum(X[i,m] for i in TF_m[m]) ==1)
                     for m in M_s[s]} #Here I should say for s in S too but X really should not depend on s
 
 AssignDemandIfTFOpen = {(m,i):
-                        CSP.addConstr(X[s,i,m] <= Y[i,s].x) 
+                        CSP.addConstr(X[i,m] <= Y[i,s].x) 
                         for m in M_s[s] for i in TF_m}
 
 DemandLessThanCapacity = {i:
-                          CSP.addConstr(quicksum(D_sml[(s,m,l)]*X[i,m,s] for l in L for m in M_s[s])<=\
+                          CSP.addConstr(quicksum(D_sml[(s,m,l)]*X[i,m] for l in L for m in M_s[s])<=\
                                         K[t][p] * Y[i,s].x)
                               for i in TF_m[m]}
-#CSP.optimize()
+CSP.optimize()
 
 ###########################
 #ReducedCSP: If CSP is infeasible, check some alternatives 
@@ -156,25 +157,34 @@ DemandLessThanCapacity = {i:
 ###########################
 
 #Problems here: define 
-M_s_d #the Set of demand points having alternative closest avaliable TFs 
-M_s_d = {}
+Md_s #the Set of demand points having alternative closest avaliable TFs 
 
-# for s in S:
-#     for m in M_s:
-#         min_distance = float('inf')  # Initialize minimum distance to positive infinity
-#         closest_tfs = set()  # Initialize an empty set for closest TFs
-        
-#         for tf in TF_m:
-#             # Calculate the distance between demand point m and TF tf using your distance calculation method
-#             distance = delta_im[tf,m]
-            
-#             if distance < min_distance:
-#                 min_distance = distance
-#                 closest_tfs = {tf}  # Reset the set with a single closest TF
-#             elif distance == min_distance:
-#                 closest_tfs.add(tf)  # Add TF to the set if it's equally close
-
-#         M_s_d[m][s] = closest_tfs  # Assign the set of closest TFs to demand point m in M_s_d
+# Dictionary of demand points with multiple closest TFs
+Md_s = {}
+# Dictionary of closest demand points for each TF
+Id_sm = {}
+# For each scenario s in S
+for s in S:
+    multiples = []
+    # For each demand point m in M_s[s]
+    for m in M_s[s]:
+        # Find the closest distance
+        closest_distance = 1000000
+        # For each TF i in I_m[m]
+        for i in TF_m[m]:
+            if delta_im[(i,m)] < closest_distance:
+                closest_distance = delta_im[(i,m)]
+        # Find the TFs that are that distance away
+        closest_TFs = []
+        # For each TF i in I_m[m]
+        for i in TF_m[m]:
+            if delta_im[(i,m)] == closest_distance:
+                closest_TFs.append(i)
+        # Add to dictionary
+        Id_sm[(s,m)] = closest_TFs
+        if len(closest_TFs) > 1:
+            multiples.append(m)
+    Md_s[s] = multiples
 
 K_d #The remaining capacity of TF_i after assigning the demand points that have unique closest TF 
 #Need access to the assigned variables
@@ -254,18 +264,41 @@ for kk in range(10):
     LIPMP.optimize()
     CutsAdded = 0 
     for s in S:
+        
+        
+        
+        # define subproblem here
+        
+        
+        
+        
         CSP.optimize()
+        
+        
+        
+        
         if CSP.status == GRB.INFEASIBLE:
+            
+            # Make the set
+            
+            
+            
+            # Define reduced here
+            
+            
             ReducedCSP.optimize()
             if ReducedCSP.status == GRB.INFEASIBLE:
                 #LIPMP.addConstr(quicksum(Y[p,s] for p in P2)>= Y[i,s] for s in S_d for i in P1[s]) #LBBD Cut 
                 CutsAdded +=1
-
-        for l in L:
-            FDSP.optimize()
-            if FDSP.status == GRB.INFEASIBLE:
-                #LIPMP.addConstr() ## Duality cut (UP)
-                CutsAdded +=1
+                
+            else:
+                
+                # third ...
+                for l in L:
+                    FDSP.optimize()
+                    if FDSP.status == GRB.INFEASIBLE:
+                        #LIPMP.addConstr() ## Duality cut (UP)
+                        CutsAdded +=1
     if CutsAdded == 0:
         break
     
