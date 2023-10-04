@@ -157,7 +157,28 @@ DemandLessThanCapacity = {i:
 
 #Problems here: define 
 M_s_d #the Set of demand points having alternative closest avaliable TFs 
+M_s_d = {}
+
+# for s in S:
+#     for m in M_s:
+#         min_distance = float('inf')  # Initialize minimum distance to positive infinity
+#         closest_tfs = set()  # Initialize an empty set for closest TFs
+        
+#         for tf in TF_m:
+#             # Calculate the distance between demand point m and TF tf using your distance calculation method
+#             distance = delta_im[tf,m]
+            
+#             if distance < min_distance:
+#                 min_distance = distance
+#                 closest_tfs = {tf}  # Reset the set with a single closest TF
+#             elif distance == min_distance:
+#                 closest_tfs.add(tf)  # Add TF to the set if it's equally close
+
+#         M_s_d[m][s] = closest_tfs  # Assign the set of closest TFs to demand point m in M_s_d
+
 K_d #The remaining capacity of TF_i after assigning the demand points that have unique closest TF 
+#Need access to the assigned variables
+
 TF_m_d #The set of equidistant TFs for a demand point m in M_s_d
 
 ReducedCSP = Model("CheckForAlternative")
@@ -224,6 +245,7 @@ FlowLessThanInventory = {j:
 
 #Define S_d P1 P2 for ReducedCSP
 S_d #Set of scenarios which infeasible clusters are found 
+
 P1 #Set of TF whose capacity is violated under scenario s in S_d 
 P2 #Set of previously closed TF locations which are closer to at least one demand point assigned to TF i in scenario S in S_d 
 
@@ -236,13 +258,13 @@ for kk in range(10):
         if CSP.status == GRB.INFEASIBLE:
             ReducedCSP.optimize()
             if ReducedCSP.status == GRB.INFEASIBLE:
-                LIPMP.addConstr(quicksum(Y[p,s] for p in P2)>= Y[i,s] for s in S_d for i in P1[s]) #LBBD Cut 
+                #LIPMP.addConstr(quicksum(Y[p,s] for p in P2)>= Y[i,s] for s in S_d for i in P1[s]) #LBBD Cut 
                 CutsAdded +=1
 
         for l in L:
             FDSP.optimize()
             if FDSP.status == GRB.INFEASIBLE:
-                LIPMP.addConstr() ## Duality cut (UP)
+                #LIPMP.addConstr() ## Duality cut (UP)
                 CutsAdded +=1
     if CutsAdded == 0:
         break
