@@ -137,7 +137,7 @@ TWENTY = {i:
                         <= KT_i[i] * Y[i,s].x) 
             for i in TF}
 
-# CSP.optimize()
+CSP.optimize()
 
 ##################################
 ##### Reduced CSP SUB-PROBLEM ####
@@ -177,36 +177,28 @@ for s in S:
 # TFd contains the dictionary of demand points with multiple TFs of equal distance for each scenario
 
 
-
-
-
-
-
-
-
-
-
-
 # Kd_si # The remaining capacity of TF i after assigning the demand points to this TF
 # Need to know which demands points were assigned to which TF
 # for example Kd_si = {1: 45, 2, 62} where 1 and 2 are TFs and 46 62 are there respective remaining capacities
 
 # Dictionary of TFs and their remaining capacities (given that the previous demand points are assigned)
-Kd_si = {}
-for s in S:
+
+# Initialize a dictionary to store the remaining capacity of each TF
+Kd = {} # where Kd is the remaining capacity of Tf i
+
+# Calculate the initial capacity at a TF
+for i in TF:
+    Kd[i] = KT_i[i] 
+# Calculate the demand at the TF according to if the demand point m is assigned there from the CSP problem
+for i in TF:    
     for m in M_s[s]:
-        for i in TFd_sm:
-            #if demand point m is assigned to TF i
-            if X[i,m].x > 0.9:
-                #then sum up the demand at that TF
-                demand_at_TF[i] = sum(D_sml[(s,m,l)] for l in L)
-                #find remaining demand
-                remaining_demand = []
-                amount = KT_i[i] - demand_at_TF[i]
-                remaining_demand.append(amount)
-            # Add to dictionary
-            KD_si[(s,i)] = remaining_demand
-    
+        if X[i,m].x > 0.9:
+            demand_at_m = sum(D_sml[(s,m,l)] for l in L)
+# Calculate the remaining capacity at the TF
+            Kd[i] -= demand_at_m
+
+
+
 
 # ReducedCSP = Model("CheckForAlternative")
 
