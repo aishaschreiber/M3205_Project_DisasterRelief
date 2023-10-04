@@ -149,7 +149,7 @@ print('PFs that are open')
 for j in PF:
     for t in T:
         if Z[j,t].x > 0.9:
-            print(Z[j,t].x)
+            print(j, Z[j,t].x)
             
 print('Total amount of each item across all TFs in each scenario')
 for s in S:
