@@ -144,38 +144,10 @@ TWENTY = {i:
 ##################################
 #It is equvalent to CSP after fixing the values of the X variables for which a unique closest TF exist.
 
-# # Dictionary of demand points with multiple closest TFs
-# Md_s = {}
-# # Dictionary of TFs that are the same distance from a demand point m (alternatives)
-# TFd_sm = {}
-# # For each scenario s in S
-# for s in S:
-#     multiples = []
-#     # For each demand point m in M_s[s]
-#     for m in M_s[s]:
-#         # Find the closest distance
-#         closest_distance = 1000000
-#         # For each TF i in I_m[m]
-#         for i in TF_m[m]:
-#             if delta_im[(i,m)] < closest_distance:
-#                 closest_distance = delta_im[(i,m)]
-#         # Find the TFs that are that distance away
-#         closest_TFs = []
-#         # For each TF i in I_m[m]
-#         for i in TF_m[m]:
-#             if delta_im[(i,m)] == closest_distance:
-#                 closest_TFs.append(i)
-#         # Add to dictionary
-#         TFd_sm[(s,m)] = closest_TFs
-#         if len(closest_TFs) > 1:
-#             multiples.append(m)
-#     Md_s[s] = multiples
-
-
 ######## NEW SETS ########
 # Initialize dictionaries for Md and TFd
-Md = {}
-TFd = {}
+Md_s = {}
+TFd_sm = {}
 
 # For each scenario s in S
 for s in S:
@@ -198,8 +170,8 @@ for s in S:
         if len(closest_TFs) > 1:
             multiples_Md.add(m)              # Add the demand point to Md
             multiples_TFd[m] = closest_TFs   # Add the demand point to TFd
-    Md[s] = multiples_Md
-    TFd[s] = multiples_TFd
+    Md_s[s] = multiples_Md
+    TFd_sm[s] = multiples_TFd
 
 # Md contains the set of demand points that have multiple TFs of equal distance in each scenario
 # TFd contains the dictionary of demand points with multiple TFs of equal distance for each scenario
