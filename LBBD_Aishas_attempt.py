@@ -135,10 +135,12 @@ NINETEEN = {(m,i):
 TWENTY = {i:
           CSP.addConstr(quicksum(u_l[l]*D_sml[(s,m,l)]*X[i,m] for l in L for m in M_s[s]) \
                         <= KT_i[i] * Y[i,s].x) 
-            for i in TF}
+            for i in TF}    
 
 CSP.optimize()
 
+
+    
 ##################################
 ##### Reduced CSP SUB-PROBLEM ####
 ##################################
@@ -148,51 +150,77 @@ CSP.optimize()
 # Initialize dictionaries for Md and TFd
 Md_s = {}
 TFd_sm = {}
+Mu_s = {} #demand points with only 1 TF
 
 # For each scenario s in S
 for s in S:
     multiples_Md = set()  # Use a set to store demand points with multiple TFs for Md
     multiples_TFd = {}    # Use a dictionary to store demand points with multiple TFs for TFd
+    
+    unique_Mu = {} #Use a dictionary to store demand points with unique TFS and their TF
+    
     # For each demand point m in M_s[s]
-    for m in M_s[s]:
+    for m in M_s[s]:        
         # Find the closest distance
         closest_distance = float('inf')
         closest_TFs = []
         # For each TF i in TF_m[m]
         for i in TF_m[m]:
-            distance = delta_im[(i, m)]
-            if distance < closest_distance:
-                closest_distance = distance
-                closest_TFs = [i]
-            elif distance == closest_distance:
-                closest_TFs.append(i)
-        # Check if there are multiple TFs at equal distance
-        if len(closest_TFs) > 1:
-            multiples_Md.add(m)              # Add the demand point to Md
-            multiples_TFd[m] = closest_TFs   # Add the demand point to TFd
+            if Y[i,s].x > 0.9:
+                total_demand_at_TF = 0
+                distance = delta_im[(i, m)]
+                if distance < closest_distance:
+                    closest_distance = distance
+                    closest_TFs = [i]
+                elif distance == closest_distance:
+                    closest_TFs.append(i)
+            # Check if there are multiple TFs at equal distance
+            if len(closest_TFs) > 1:
+                multiples_Md.add(m)              # Add the demand point to Md
+                multiples_TFd[m] = closest_TFs   # Add the demand point to TFd     
+                
+                # unique_Mu[m] = closest_TFs[0]
+                # Unique_TFd[m] = cloest_TFs[0]
+    
     Md_s[s] = multiples_Md
     TFd_sm[s] = multiples_TFd
+        
+        # TFu_sm[s] = Unique_TFd 
+    Mu_s[s] = unique_Mu
 
 # Md contains the set of demand points that have multiple TFs of equal distance in each scenario
 # TFd contains the dictionary of demand points with multiple TFs of equal distance for each scenario
+# Mu contains the dictionary of demand points with multiple TFs as the keys, and their TF as the values
 
-
-# Kd_si # The remaining capacity of TF i after assigning the demand points to this TF
-# Need to know which demands points were assigned to which TF
-# for example Kd_si = {1: 45, 2, 62} where 1 and 2 are TFs and 46 62 are there respective remaining capacities
-
-# Dictionary of TFs and their remaining capacities (given that the previous demand points are assigned)
+# Kd_si # The remaining capacity of TF are unique demand points assigned
 
 # Initialize a dictionary to store the remaining capacity of each TF
 Kd = {} # where Kd is the remaining capacity of Tf i
 
-# Calculate the initial capacity at a TF
-# for i in TF:
-#     Kd[i] = KT_i[i] 
+for s in S:
+    for m in Mu_s[s]:
+        for i in Mu_s[s][m]:
+            demand_of_m = sum(D_sml[(s,m,l)] for l in L)
+        
+            
+
+# for s in S:
+#     for i in TFu_sm[s]:
+#         #intital capacity
+#         Kd[i] = KT_i[i]
+#         #calculate demand at that TF
+#         for m in M_s[s]:
+#             if m in 
+#         remaining_capacity = 
+# # Calculate the initial capacity at a TF
+# # for i in TFd_sm:
+# #     Kd[i] = KT_i[i] 
 # # Calculate the demand at the TF according to if the demand point m is assigned there from the CSP problem
-# for i in TF:    
-#     for m in M_s[s]:
-#         if X[i,m].x > 0.9:
+# for m in Md_s[s]:
+#     for i in TFd_sm[s][m]:   
+#         Kd[i] = KT_i[i] 
+#         # if a demand point only has 1 
+#         # if X[i,m].x > 0.9:
 #             demand_at_m = sum(D_sml[(s,m,l)] for l in L)
 # # Calculate the remaining capacity at the TF
 #             Kd[i] -= demand_at_m
@@ -200,20 +228,20 @@ Kd = {} # where Kd is the remaining capacity of Tf i
 
 
 
-ReducedCSP = Model("CheckForAlternative")
+# ReducedCSP = Model("CheckForAlternative")
 
-Xd = {(i,m): ReducedCSP.addVar(vtype=GRB.BINARY) for m in Md_s[s] for i in TFd_sm[s][m]}
+# Xd = {(i,m): ReducedCSP.addVar(vtype=GRB.BINARY) for m in Md_s[s] for i in TFd_sm[s][m]}
 
 # #No objective 
 
 # #Constraints
 # Constraint24 = {m:
-#         ReducedCSP.addConstr(quicksum(X[i,m] for i in TFd_sm) == 1) for m in Md_s[s]}
+#         ReducedCSP.addConstr(quicksum(Xd[i,m] for i in TFd_sm[s][m]) == 1) for m in Md_s[s]}
 
 # Constraint25 = {i:
-#             ReducedCSP.addConstr(quicksum(u_l[l]*D_sml[(s,m,l)]*X[i,m] for m in Md_s[s] for l in L) 
+#             ReducedCSP.addConstr(quicksum(u_l[l]*D_sml[(s,m,l)]*Xd[i,m] for m in Md_s[s] for l in L) 
 #             <= Kd_si[s][i]) 
-#             for i in TFd_sm}
+#             for i in TFd_sm[s][m]}
 
 # # ReducedCSP.optimize()
 
