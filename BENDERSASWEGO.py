@@ -267,28 +267,6 @@ for s in S:
 # (s,i): represents the TF that the m is CURRENTLY ASSIGNED TO 
 P2 = {}
 for s in Sd:
-    # Find all the (s,i) tuples and assign them an empty list
-    for i in CURRENT_ASSIGNED[s]:
-        # Find the list of m values for this TF i and check if they have alternatives
-        mlist = CURRENT_ASSIGNED[s][i]
-        for m in mlist:
-            if len(ALTERNATIVES[s][m]) > 0:
-                P2[(s,i)] = []
- 
-
-        # Find all the alternative closedTFs available for each tuple (s,i)
-        # This means, we need to find all the demand points assigned to each i (and then find their alternative TFs)
-        altlist = []
-        # Iterate through the m values that have this TF i: 
-        for m in CURRENT_ASSIGNED[s][i]:
-            # iterate through these m values: and add other closer TFs from FAKE[s][m]
-            altlist += ALTERNATIVES[s][m] # except we dont want to add TF if its already in the list from another demant point
-        P2[(s,i)] = altlist
-            
-
-
-P2 = {}
-for s in Sd:
     for i in CURRENT_ASSIGNED[s]:
         altlist = []
         # Find all the alternative closedTFs available for each tuple (s,i)
