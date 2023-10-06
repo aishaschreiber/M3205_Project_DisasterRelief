@@ -197,7 +197,8 @@ for s in S:
 
     
 ##### Calculate the remaining capacity at each TF
-Kd_si = {} # dictionary: key TF: values remaining capacity
+# dictionary: key TF: values remaining capacity
+Kd_si = {} 
 for s in S:
     Kd = {}
     for i in avail_TFs[s]:
@@ -229,7 +230,7 @@ for s in Sd:
             tf.append(i)
     P1[s] = tf
  
-# YES[s][TF][m] Dictionary: Key- TFs: Values- demand points assigned to that TF
+# CURRENT_ASSIGNED[s][TF][m] is a Dictionary: Key- TFs: Values- demand points assigned to that TF
 CURRENT_ASSIGNED = {}
 for s in S:
     listofm = {}
@@ -243,7 +244,7 @@ for s in S:
         listofm[i] = m_assignedto_i
     CURRENT_ASSIGNED[s] = listofm
 
-# FAKE represents a dictionary [s][m][TFs] where it will gives a list of alernative closed Tfs to a demand point m
+# ALTERNATIVES represents a dictionary [s][m][TFs] where it will gives a list of alernative closed Tfs to a demand point m
 ALTERNATIVES = {}
 for s in S:
     for i in avail_TFs[s]:
