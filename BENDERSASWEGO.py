@@ -287,9 +287,19 @@ for s in Sd:
             
 
 
+P2 = {}
+for s in Sd:
+    for i in CURRENT_ASSIGNED[s]:
+        altlist = []
+        # Find all the alternative closedTFs available for each tuple (s,i)
+        # This means, we need to find all the demand points assigned to each i (and then find their alternative TFs)
+        for m in CURRENT_ASSIGNED[s][i]:
+            if m in ALTERNATIVES.get(s,  {}):
+                altlist.extend(ALTERNATIVES[s][m])
+        if altlist:
+            #this creates a dictionary with keys (s,i) 
+            P2[(s, i)] = altlist
 
-            
-            
             
 
             
