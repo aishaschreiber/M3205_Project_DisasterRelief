@@ -209,22 +209,28 @@ for s in S:
         Kd[i] = KT_i[i] - total_demand_at_TF
     Kd_si[s] = Kd
  
-  
-# P1(s)    
-# Set of violated scenarios
-# Set of violated TFs
-# if Kd_si[s]
-P1 = {}
+
+# S' : set of scenarios in which TFs capacity was  violated
+Sd = []
 for s in S:
+    for i in Kd_si[s]:
+        if Kd_si[s][i] < 0:
+            if s in Sd:
+                []
+            else:
+                Sd.append(s)
+    
+# P1(s): set of TFs whos capacity is violated under scenario s in S'
+P1 = {}
+for s in Sd: 
     tf = []
     for i in avail_TFs[s]:
         if Kd_si[s][i] < 0:
             tf.append(i)
     P1[s] = tf
  
-    
-# Dictionary: Key- TFs: Values- demand points assigned to that TF
-YES = {}
+# YES[s][TF][m] Dictionary: Key- TFs: Values- demand points assigned to that TF
+CURRENT_ASSIGNED = {}
 for s in S:
     listofm = {}
     for i in avail_TFs[s]:
@@ -235,41 +241,56 @@ for s in S:
             #then append this m
                 m_assignedto_i.append(m)
         listofm[i] = m_assignedto_i
-    YES[s] = listofm
-        
+    CURRENT_ASSIGNED[s] = listofm
 
-
-# P2(s,i)       
-# Set of closed TFs that are closer to at least one demand point assigned to TF i in scenario s
-
-
-
-
-
-# FAKE represents a dictionary s:m:TFS where it will gives a list of alernative closed Tfs to a demand point m
-FAKE = {}
-
-# P2 represents a dictionary: key - tuples (s,i), values - list of alternative tfs
-# P2 = {}
-
-
-# find current distance
+# FAKE represents a dictionary [s][m][TFs] where it will gives a list of alernative closed Tfs to a demand point m
+ALTERNATIVES = {}
 for s in S:
-    # p2s = {}
     for i in avail_TFs[s]:
+        fk2 = {}
         for m in YES[s][i]:
             tfs = []
+            #current distance to assigned TF
             current_distance = delta_im[(i,m)]
             for a in closed_TFs[s]:
+                #distance to each closed TF
                 distance_to_closedTF = delta_im[(a,m)]
                 if distance_to_closedTF < current_distance:
                     #add this TF to the list of possible alternatives (P2)    
                     tfs.append(a)
-            p2s[m] = tfs
+            fk2[m] = tfs        
+    ALTERNATIVES[s] = fk2
+
+
     
-    
-    FAKE[s] = p2s
-    # P2[s,i] = tfs
+# P2(s,i): dictionary: Key- (s,i) tuple. Values- closed TFs with a demand point thats closer (TFs are inside FAKE)     
+# (s,i): represents the TF that the m is CURRENTLY ASSIGNED TO 
+P2 = {}
+for s in Sd:
+    # Find all the (s,i) tuples and assign them an empty list
+    for i in CURRENT_ASSIGNED[s]:
+        # Find the list of m values for this TF i and check if they have alternatives
+        mlist = CURRENT_ASSIGNED[s][i]
+        for m in mlist:
+            if len(ALTERNATIVES[s][m]) > 0:
+                P2[(s,i)] = []
+ 
+
+        # Find all the alternative closedTFs available for each tuple (s,i)
+        # This means, we need to find all the demand points assigned to each i (and then find their alternative TFs)
+        altlist = []
+        # Iterate through the m values that have this TF i: 
+        for m in CURRENT_ASSIGNED[s][i]:
+            # iterate through these m values: and add other closer TFs from FAKE[s][m]
+            altlist += ALTERNATIVES[s][m] # except we dont want to add TF if its already in the list from another demant point
+        P2[(s,i)] = altlist
+            
+
+
+
+            
+            
+            
 
             
 
