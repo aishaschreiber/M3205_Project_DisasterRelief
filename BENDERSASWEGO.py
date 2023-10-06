@@ -194,9 +194,9 @@ for s in S:
     Md_s[s] = multi_demandpts
     TFd_sm[s] = multi_Tfs
     TFu_sm[s] = unique_Tf
+
     
 ##### Calculate the remaining capacity at each TF
-
 Kd_si = {} # dictionary: key TF: values remaining capacity
 for s in S:
     Kd = {}
@@ -278,9 +278,28 @@ for s in Sd:
             #this creates a dictionary with keys (s,i) 
             P2[(s, i)] = altlist
 
-            
+    
+#####################################################
+## REDUCED CSP SUB-PROBLEM: Alternative clustering ##  
+#####################################################      
+ 
+ReducedCSP = Model("CheckForAlternative")
 
-            
+Xd = {(i,m): ReducedCSP.addVar(vtype=GRB.BINARY) for m in Md_s[s] for i in TFd_sm[s][m]}
+
+#No objective 
+
+#Constraints
+Constraint24 = {m:
+        ReducedCSP.addConstr(quicksum(Xd[i,m] for i in TFd_sm[s][m]) == 1) for m in Md_s[s]}
+
+Constraint25 = {i:
+            ReducedCSP.addConstr(quicksum(u_l[l]*D_sml[(s,m,l)]*Xd[i,m] for m in Md_s[s] for l in L) 
+            <= Kd_si[s][i]) 
+            for i in TFd_sm[s][m]}
+
+# ReducedCSP.optimize()
+         
 
             
 
