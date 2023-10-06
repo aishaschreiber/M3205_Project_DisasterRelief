@@ -284,7 +284,7 @@ for s in Sd:
 ## REDUCED CSP SUB-PROBLEM: Alternative clustering ##  
 #####################################################      
  
-ReducedCSP = Model("CheckForAlternative")
+ReducedCSP = Model("CheckForAlternatives")
 
 Xd = {(i,m): ReducedCSP.addVar(vtype=GRB.BINARY) for m in Md_s[s] for i in TFd_sm[s][m]}
 
