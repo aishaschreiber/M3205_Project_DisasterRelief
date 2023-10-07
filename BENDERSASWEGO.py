@@ -249,7 +249,7 @@ ALTERNATIVES = {}
 for s in S:
     for i in avail_TFs[s]:
         fk2 = {}
-        for m in YES[s][i]:
+        for m in CURRENT_ASSIGNED[s][i]:
             tfs = []
             #current distance to assigned TF
             current_distance = delta_im[(i,m)]
