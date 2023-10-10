@@ -3,19 +3,19 @@ from gurobipy import *
 import sys
 import os
 
-# Add a new directory to the Python path
-new_directory = 'D:/UQ/2023 Semester2/MATH3205/Project/Program/M3205_Project_DisasterRelief-main/M3205_Project_DisasterRelief-main'
+# # Add a new directory to the Python path
+# new_directory = 'D:/UQ/2023 Semester2/MATH3205/Project/Program/M3205_Project_DisasterRelief-main/M3205_Project_DisasterRelief-main'
 
-os.chdir(new_directory)
+# os.chdir(new_directory)
 
-# Verify the change by printing the current working directory
-current_directory = os.getcwd()
-print("Current working directory:", current_directory)
+# # Verify the change by printing the current working directory
+# current_directory = os.getcwd()
+# print("Current working directory:", current_directory)
 
-import access_data_edit_2
+import access_data_edit
 
 ### ----- INSTANCE 2 ----- ###
-GET = access_data_edit_2.get_data_sets()
+GET = access_data_edit.get_data_sets()
 #SETS   
 # Set of temporary facility locations (aka 'I' in the paper)
 TF = GET['TF']
@@ -252,9 +252,9 @@ def FindCloserTF(avail_TFs, Sd):
                         #add this TF to the list of possible alternatives (P2)    
                         tfs.append(a)
                 fk2[m] = tfs        
-        ALTERNATIVES[s] = fk2
+        ALTERNATIVES[s][i] = fk2
               
-    # P2(s,i): dictionary: Key- (s,i) tuple. Values- closed TFs with a demand point thats closer (TFs are inside FAKE)     
+    # P2(s,i): dictionary: Key- (s,i) tuple. Values- closed TFs with a demand point thats closer (TFs are inside Alternatives)     
     # (s,i): represents the TF that the m is CURRENTLY ASSIGNED TO 
     P2 = {}
     for s in Sd:
@@ -264,10 +264,15 @@ def FindCloserTF(avail_TFs, Sd):
             # This means, we need to find all the demand points assigned to each i (and then find their alternative TFs)
             for m in CURRENT_ASSIGNED[s][i]:
                 if m in ALTERNATIVES.get(s,  {}):
-                    altlist.extend(ALTERNATIVES[s][m])
-            if altlist:
+                    for i in ALTERNATIVES[s][m]:
+                        if i not in altlist:
+                            altlist.append(i)
+                     
+                    # if i not in altlist:
+                        # altlist.extend(ALTERNATIVES[s][m])
+            # if altlist:
                 #this creates a dictionary with keys (s,i) 
-                P2[(s, i)] = altlist
+            P2[(s, i)] = altlist
     
     return P2
     
@@ -275,11 +280,11 @@ def FindCloserTF(avail_TFs, Sd):
 
 ########BENDERS DECOMPOSITION#############
 
-
+CutsAdded = 0 
 for kk in range(10):
     print("We are In the Loop")
     LIPMP.optimize()
-    CutsAdded = 0 
+
     for s in S:
                   
         # define subproblem here
@@ -331,10 +336,11 @@ for kk in range(10):
             Constraint24 = {m:
                     ReducedCSP.addConstr(quicksum(Xd[i,m] for i in TFd_sm[s][m]) == 1) for m in Md_s[s]}
             
-            Constraint25 = {i:
+            Constraint25 = {(i,m):
                         ReducedCSP.addConstr(quicksum(u_l[l]* quicksum(D_sml[(s,m,l)]*Xd[i,m] for m in Md_s[s]) for l in L) 
                         <= Kd_si[s][i]) 
-                        for i in TFd_sm[s][m]}
+                        for m in Md_s[s] for i in TFd_sm[s][m]} 
+                # does the  for m in Md_s[s]  change the constraint tho?????
 
           #Solve for Reduced     
           
@@ -343,7 +349,7 @@ for kk in range(10):
             
             if ReducedCSP.status == GRB.INFEASIBLE:
                 print("ReducedCSP Infeasible")
-                LIPMP.addConstr(quicksum(Y[p,s] for p in P2[(s,i)])>= Y[i,s] for s in Sd for i in P1[s]) #LBBD Cut 
+                LIPMP.addConstr(quicksum(Y[p,s] for p in P2[(s,i)]) >= Y[i,s] for s in Sd for i in P1[s]) #LBBD Cut 
                 CutsAdded +=1
                 print(CutsAdded)
             
@@ -362,18 +368,29 @@ for kk in range(10):
             
             #No Objective
 
+            ####THESE TWO CONSTRAINTS ARE HAVING ATTRUBUTE PROBLEM
+
+
             #Constraint29
             FlowGreaterThanSCW = {(i,k):
-                                 FDSP.addConstr(quicksum(F[j,i] for j in PF_ik[i,k]) >= (R_kl[k,l] * D_bar[(s,i,l)]))
+                                 FDSP.addConstr(quicksum(F[j,i] for j in PF_ik[i,k]) >= (R_kl[k,l] * D_bar[(s,i,l)] *Y[i,s].x))
                                  for i in TF for k in K}
             
+                
             #Constraint30
             FlowLessThanInventory = {j:
-                                     FDSP.addConstr(quicksum(F[j,i] for i in TF)<= quicksum(I[j,l].x for l in L))
+                                      FDSP.addConstr(quicksum(F[j,i] for i in TF)<= I[j,l].x )
                 for j in PF}
-        
+            
+            #Rearranged Constraint30 
+            # FlowLessThanInventory = {j:
+            #                          FDSP.addConstr(quicksum(F[j,i] for i in TF) -I[j,l].x <= 0)
+            #     for j in PF}
+                
+            #########################################
                 
             FDSP.setParam("OutputFlag",0)
+            FDSP.Params.Presolve = 0
             FDSP.optimize()
             print("FDSP Solved")
             
