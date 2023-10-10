@@ -292,7 +292,7 @@ def FindCloserTF(avail_TFs, Sd):
 ########BENDERS DECOMPOSITION#############
 
 
-for kk in range(10):
+for kk in range(20):
     print("############ We are In the Loop Number", kk+1, "############ ")
     LIPMP.optimize()
     print("LIPMP Solved")
@@ -421,6 +421,11 @@ for kk in range(10):
                     print("FDSP Cut added for item ", l)
                     # LIPMP.optimize()
                     CutsAdded +=1
+                    print("FAILED SOLUTION OBJ", LIPMP.objVal)
+                else:
+                    print("FINAL OBJECTIVE", LIPMP.objVal)
+                    ### PRINT OTHER SOLUTION STUFF ###
+                    
     if CutsAdded == 0:
         break
 
