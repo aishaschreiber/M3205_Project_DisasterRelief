@@ -3,7 +3,7 @@ import csv
 ### ----- INSTANCE 2 ----- ###
 # Read in the data from csv and take each component and put it into a dictionary        
 complete_data = []
-with open("/Users/aishaschreiber/Documents/GitHub/M3205_Project_DisasterRelief/CLFDIP Model Data Generation Tool/Instances (Sets and Parameters)/Pr01_S2.txt", 'r') as textfile:
+with open("/Users/aishaschreiber/Documents/GitHub/M3205_Project_DisasterRelief/CLFDIP Model Data Generation Tool/Instances (Sets and Parameters)/Pr02_S4.txt", 'r') as textfile:
     for line in textfile:
         complete_data.append(line.strip())  # Remove leading/trailing whitespace
         
@@ -54,6 +54,26 @@ def load_into_dict(start, end, value_type):
         my_dict[key] = values
     return my_dict
 
+def load_into_dict2(start, end, value_type):
+    my_dict = {}
+    for i in range(start, end):
+        line = complete_data[i]
+        key_str, value_str = line.split(': ')
+        # Format key
+        key_parts = key_str.split('-')
+        if len(key_parts) == 1:
+            key = int(key_parts[0])
+        else:
+            key = tuple(map(int, key_parts))
+        # Format value by splitting on semicolons
+        values = [float(val.replace(',', '.')) for val in value_str.split(';')]
+        # Convert value to a single element if there's only one element in the list
+        # if len(values) == 1:
+        #     values = values[0]
+        # Add to dictionary
+        my_dict[key] = values
+    return my_dict
+
 
 
 # Sets
@@ -76,7 +96,7 @@ L = range(get_set_size(start_indexes[5])+1)
 Set of PFs that can serve TF i within SCW k (J_ki ⊆ J_k'i , for k < k')
 Take the 16th-66th rows of the complete_data and put them into a dictoinary J_ik[(i,k)]"""
 
-PF_ik = load_into_dict(start_indexes[6]+1, start_indexes[7], 'int')
+PF_ik = load_into_dict2(start_indexes[6]+1, start_indexes[7], 'int')
 
 """
 Set of demand points under disaster scenario s

@@ -1,22 +1,8 @@
-
 from gurobipy import *
-
-import sys
-import os
-
-# Add a new directory to the Python path
-new_directory = 'D:/UQ/2023 Semester2/MATH3205/Project/Program/M3205_Project_DisasterRelief-main/M3205_Project_DisasterRelief-main'
-
-os.chdir(new_directory)
-
-# Verify the change by printing the current working directory
-current_directory = os.getcwd()
-print("Current working directory:", current_directory)
-
-import access_data_edit_2
+import access_data_edit
 
 ### ----- INSTANCE 2 ----- ###
-GET = access_data_edit_2.get_data_sets()
+GET = access_data_edit.get_data_sets()
 #SETS   
 # Set of temporary facility locations (aka 'I' in the paper)
 TF = GET['TF']

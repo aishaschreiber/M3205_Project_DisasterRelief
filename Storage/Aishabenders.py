@@ -286,7 +286,7 @@ def FindCloserTF(avail_TFs, Sd):
     
     return P2
     
-        
+         for k in K if j in PF_ki
 
 
 ########BENDERS DECOMPOSITION#############
