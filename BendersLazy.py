@@ -596,9 +596,9 @@ def Callback(model, where):
 
 
 
-
-
 LIPMP.setParam('LazyConstraints',1)
 LIPMP.optimize(Callback)        
 
-
+for s in S: 
+    for j in PF:
+        print()
