@@ -1,4 +1,18 @@
+
 from gurobipy import *
+
+import sys
+import os
+
+# Add a new directory to the Python path
+new_directory = 'D:/UQ/2023 Semester2/MATH3205/Project/Program/M3205_Project_DisasterRelief-main/M3205_Project_DisasterRelief-main'
+
+os.chdir(new_directory)
+
+# Verify the change by printing the current working directory
+current_directory = os.getcwd()
+print("Current working directory:", current_directory)
+
 import access_data_edit
 
 ### ----- INSTANCE 2 ----- ###
@@ -291,7 +305,7 @@ def FindCloserTF(avail_TFs, Sd):
                     if tf not in altlist:
                         altlist.append(tf)
 
-            if altlist:
+            #if altlist:
                 #this creates a dictionary with keys (s,i) 
                 P2[(s, i)] = altlist
     
@@ -400,7 +414,7 @@ for kk in range(10):
                 
                     for i in TF:
                         if i in Reverse_Id[s]:
-                            D_bar[(s,i,l)] = quicksum(D_sml[(s,m,l)] * Xd[i,m] for m in Md_s[s])
+                            D_bar[(s,i,l)] = quicksum(D_sml[(s,m,l)] * Xd[i,m].x for m in Md_s[s])
                         elif i in Reverse_Iu[s]:
                             D_bar[(s,i,l)] = quicksum(D_sml[(s,m,l)] for m in Reverse_Iu[s][i])
                         else:
@@ -408,7 +422,7 @@ for kk in range(10):
                         
                 avail_TFs, closed_TFs =  AvailableTF(Y)  
                 
-                DFDSP = Model("Flow Distribution Sub-Problem")
+                DFDSP = Model("Dual of Flow Distribution Sub-Problem")
                 # amount of item l transported from PJ j to TF i under scenario s
                 # This should only consider Opened TFs and PFs (I think)
                 

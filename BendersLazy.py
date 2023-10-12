@@ -509,9 +509,6 @@ def Callback(model, where):
                                 for tf in ALTERNATIVES[b][i][m]:
                                     if tf not in altlist:
                                         altlist.append(tf)
-
-                            if altlist:
-                                #this creates a dictionary with keys (s,i) 
                                 P2[(b, i)] = altlist
                                 
     #################Finish defining new set##########################
@@ -599,6 +596,14 @@ def Callback(model, where):
 LIPMP.setParam('LazyConstraints',1)
 LIPMP.optimize(Callback)        
 
-for s in S: 
+print("Opened Permanent Facility")
+for t in T: 
     for j in PF:
-        print()
+        if Z[j,t].x>0.9:
+            print("PF ",j," with capacity ",t)
+
+print("Opened Temporary Facility")
+for s in S: 
+    for i in TF:
+        if Y[i,s].x>0.9:
+            print("TF",i," is openned under scenario ",s)
