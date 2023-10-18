@@ -304,7 +304,7 @@ def FindCloserTF(avail_TFs, Sd):
                     if tf not in altlist:
                         altlist.append(tf)
 
-            if altlist:
+            #if altlist:
                 #this creates a dictionary with keys (s,i) 
                 P2[(s, i)] = altlist
     
@@ -536,11 +536,17 @@ def Callback(model, where):
                     ReducedCSP.optimize()
                     #print("ReducedCSP Solved")
                     
+                    #if ReducedCSP.status == GRB.INFEASIBLE:
+                        #print("ReducedCSP Infeasible")
+                    #    LIPMP.cbLazy(quicksum(Y[p,s] for p in P2[(s,i)]) -Y[i,s] >= 0 for s in Sd for i in P1[s]) #LBBD Cut 
+                     #   CutsAdded +=1
+                        #print("Reduced cut added")
                     if ReducedCSP.status == GRB.INFEASIBLE:
                         #print("ReducedCSP Infeasible")
-                        LIPMP.cbLazy(quicksum(Y[p,s] for p in P2[(s,i)]) >= Y[i,s] for s in Sd for i in P1[s]) #LBBD Cut 
-                        CutsAdded +=1
-                        #print("Reduced cut added")
+                        for d in Sd:
+                            for i in P1[d]:                               
+                                LIPMP.cbLazy(quicksum(Y[p,d] for p in P2[(d,i)]) -Y[i,d] >= 0) #LBBD Cut 
+                                CutsAdded +=1
                         
                     
                 if CSP.status != GRB.INFEASIBLE or ReducedCSP.status != GRB.INFEASIBLE:   
