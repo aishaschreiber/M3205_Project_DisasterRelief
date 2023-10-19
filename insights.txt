@@ -1,0 +1,15 @@
+Instance: CLFDIP Model Data Generation Tool\Instances (Sets and Parameters)\Pr01_S2.txt
+Simple Layout
+{'ObjectiveValue': 3059569.2, 'OpenedPFs': [{'PF': 16, 'Size': 0, 'Item0Prepositioned': 3990.6900000000005, 'Item1Prepositioned': 60464.999999546926, 'Item2Prepositioned': 919.7982500072496}, {'PF': 0, 'Size': 1, 'Item0Prepositioned': 26221.309999999998, 'Item1Prepositioned': 241655.0000004531, 'Item2Prepositioned': 1861.2017499927504}], 'Time': 132.2869999408722}
+Running Benders
+{'ObjectiveValue': 3059569.2, 'OpenedPFs': [{'PF': 22, 'Size': 0, 'Item0Prepositioned': 0.0, 'Item1Prepositioned': 0.0, 'Item2Prepositioned': 2186.5400000000004}, {'PF': 0, 'Size': 1, 'Item0Prepositioned': 30212.0, 'Item1Prepositioned': 302120.0, 'Item2Prepositioned': 594.4599999999996}], 'Time': 8.541000127792358}
+Instance: CLFDIP Model Data Generation Tool\Instances (Sets and Parameters)\Pr01_S3.txt
+Simple Layout
+{'ObjectiveValue': 5649525.199999999, 'OpenedPFs': [{'PF': 1, 'Size': 1, 'Item0Prepositioned': 20083.19999958432, 'Item1Prepositioned': 386065.00000194844, 'Item2Prepositioned': 11.0}, {'PF': 16, 'Size': 1, 'Item0Prepositioned': 28778.41000041568, 'Item1Prepositioned': 48439.99999996513, 'Item2Prepositioned': 839.0000000000001}, {'PF': 34, 'Size': 1, 'Item0Prepositioned': 8350.39, 'Item1Prepositioned': 137614.99999808642, 'Item2Prepositioned': 4404.0}], 'Time': 205.7630000114441}
+Running Benders
+{'ObjectiveValue': 5649525.2, 'OpenedPFs': [{'PF': 0, 'Size': 1, 'Item0Prepositioned': 0.0, 'Item1Prepositioned': 480892.5, 'Item2Prepositioned': 0.0}, {'PF': 9, 'Size': 1, 'Item0Prepositioned': 0.0, 'Item1Prepositioned': 91227.5, 'Item2Prepositioned': 1850.62}, {'PF': 34, 'Size': 1, 'Item0Prepositioned': 57212.0, 'Item1Prepositioned': 0.0, 'Item2Prepositioned': 3403.38}], 'Time': 16.95799994468689}
+Instance: CLFDIP Model Data Generation Tool\Instances (Sets and Parameters)\Pr01_S4.txt
+Simple Layout
+{'ObjectiveValue': 5649525.2, 'OpenedPFs': [{'PF': 1, 'Size': 1, 'Item0Prepositioned': 16127.466666550366, 'Item1Prepositioned': 374045.0000005451, 'Item2Prepositioned': 500.0}, {'PF': 16, 'Size': 1, 'Item0Prepositioned': 26160.563333449634, 'Item1Prepositioned': 77320.0000006113, 'Item2Prepositioned': 271.2}, {'PF': 28, 'Size': 1, 'Item0Prepositioned': 14923.969999999998, 'Item1Prepositioned': 120754.99999884359, 'Item2Prepositioned': 4482.8}], 'Time': 1071.6169998645782}
+Running Benders
+{'ObjectiveValue': 5649525.2, 'OpenedPFs': [{'PF': 0, 'Size': 1, 'Item0Prepositioned': 57212.0, 'Item1Prepositioned': 0.0, 'Item2Prepositioned': 3403.38}, {'PF': 22, 'Size': 1, 'Item0Prepositioned': 0.0, 'Item1Prepositioned': 91227.49999999627, 'Item2Prepositioned': 1850.62}, {'PF': 28, 'Size': 1, 'Item0Prepositioned': 0.0, 'Item1Prepositioned': 480892.5, 'Item2Prepositioned': 0.0}], 'Time': 14.733000040054321}
