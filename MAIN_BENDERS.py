@@ -453,5 +453,7 @@ def BendersLazy(instance: str, verbose: bool = True) -> dict:
 
 # This is what runs when you click play
 if __name__ == "__main__":
-    default_instance = "CLFDIP Model Data Generation Tool\Instances (Sets and Parameters)\Pr01_S2.txt"
-    dictionary = BendersLazy(default_instance, verbose=False)
+    default_instance = "CLFDIP Model Data Generation Tool/Instances (Sets and Parameters)/Pr01_S2.txt"
+    dictionary = BendersLazy(default_instance, verbose=True)
+    # Set verbose to true to print
+
