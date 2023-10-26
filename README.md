@@ -2,7 +2,7 @@
 Aisha, Ruoxuan, Lucy
 
 Steps to run model:
-1. Ensure you have downloaded the files/folders: 'BendersLazy.py', 'CLFDIP Model Data Generation Tool' folder, access_data_edit.py
+1. Ensure you have downloaded the Three files/folders: 'BendersLazy.py', 'CLFDIP Model Data Generation Tool' folder, and 'access_data_edit.py'
 2. Ensure the working directory is the same as the 'CLFDIP Model Data Generation Tool' folder
 3. 'BendersLazy.py' operates with a Verbose, thus setting Verbose = TRUE will ensure the output is printed. To run the model, just run 'BendersLazy.py'. 
 4. To run the MIP formulation, use 'Simple_Layout.py'
