@@ -1,5 +1,5 @@
 # M3205_Project_DisasterRelief
-Aisha, Ruoxuan, Lucy
+Aisha Schreiber, Ruoxuan Shi, Lucy Carra Schulz
 
 Steps to run model:
 1. Ensure you have downloaded the Three files/folders: 'MAIN_BENERS.py', 'CLFDIP Model Data Generation Tool' folder, and 'access_data_edit.py'
