@@ -109,12 +109,10 @@ def BendersLazy(instance: str, verbose: bool = True) -> dict:
                                     for s in S for l in L}
     
     ##########################
-    #End of Master Problem
+    # End of Master Problem
 
-
-    #######################################
-    #### FUNCTIONS FOR MAKING NEW SETS ####
-    #######################################
+    ###################################################################
+    # This function is used in the sub-problems to define some new sets
     
     def AvailableTF(Y):
         avail_TFs = {}
@@ -137,11 +135,7 @@ def BendersLazy(instance: str, verbose: bool = True) -> dict:
     
     ######## BENDERS DECOMPOSITION #############
     
-    ######## CALLBACK FUNCTION ##############
-    #- Callback Function doesnt like other calling other functions outside itself, so we are going to define the sets in the loop
-    #- When defining them in a loop, used for b in S instead of for s in S to avoid violating the outter loop
-    #Problems:
-        #1. Do we need cbGetSolution for the Subproblems? 
+    # The Benders Loop is defined in a Callback function
 
     def Callback(model, where):
         if where == GRB.Callback.MIPSOL:
