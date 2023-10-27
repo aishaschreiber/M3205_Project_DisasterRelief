@@ -2,7 +2,20 @@ from gurobipy import *
 import access_data_edit
 
 
-def SimpleLayout(instance: str, verbose: bool = True):
+def SimpleLayout(instance: str, verbose: bool = True, valid15 = True, valid16 = True, valid17 = True) -> dict:
+    """
+    Solves a mixed-integer programming (MIP) problem for disaster relief facility layout optimization.
+    
+    Args:
+    - instance (str): the name of the instance to be solved
+    - verbose (bool): whether to print the optimization progress (default True)
+    - valid15 (bool): whether to use valid inequality 15 (default True)
+    - valid16 (bool): whether to use valid inequality 16 (default True)
+    - valid17 (bool): whether to use valid inequality 17 (default True)
+    
+    Returns:
+    - dict: a dictionary containing the objective value, the opened permanent facilities, and the runtime
+    """    
 
     GET = access_data_edit.get_data_sets(instance)
     # SETS
@@ -122,19 +135,20 @@ def SimpleLayout(instance: str, verbose: bool = True):
 
     # VALID INEQUALITIES
 
-    FIFTEEN = {(s,m):
-               LP.addConstr(quicksum(Y[i,s] for i in TF_m[m]) >=1)
-               for s in S for m in M_s[s]}
-    
-    SIXTEEN = {(s,i):
-               LP.addConstr(quicksum(Z[j,t] for j in PF_ik[(i,1)] for t in T) >= Y[i,s])
-               for s in S for i in TF}
-    
-    SEVENTEEN = {(s,l):
-                LP.addConstr(quicksum(I[j,l] for j in PF)
-                >= quicksum(D_sml[(s,m,l)]
-                for m in M_s[s] if (s,m,l) in D_sml))
-                for s in S for l in L}
+    if valid15:
+        FIFTEEN = {(s,m):
+                LP.addConstr(quicksum(Y[i,s] for i in TF_m[m]) >=1)
+                for s in S for m in M_s[s]}
+    if valid16:
+        SIXTEEN = {(s,i):
+                LP.addConstr(quicksum(Z[j,t] for j in PF_ik[(i,1)] for t in T) >= Y[i,s])
+                for s in S for i in TF}
+    if valid17:
+        SEVENTEEN = {(s,l):
+                    LP.addConstr(quicksum(I[j,l] for j in PF)
+                    >= quicksum(D_sml[(s,m,l)]
+                    for m in M_s[s] if (s,m,l) in D_sml))
+                    for s in S for l in L}
 
     LP.optimize()
 

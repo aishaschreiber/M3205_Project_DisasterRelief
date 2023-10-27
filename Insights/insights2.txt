@@ -1,0 +1,27 @@
+Option: [False, False, False]
+1405.289999961853
+Option: [True, True, True]
+156.45499992370605
+
+Option: [True, True, False]
+311.481999874115
+Option: [False, False, True]
+534.5510001182556
+
+Option: [True, False, True]
+346.16100001335144
+Option: [False, True, False]
+487.96399998664856
+
+Option: [False, True, True]
+263.4579999446869
+Option: [True, False, False]
+556.2530000209808
+
+Alloff = 1405.289999961853
+AllOn = 156.45499992370605
+
+
+names = [Constraint 15, Constraint 16, Constraint 17]
+offTime = [263.4579999446869, 346.16100001335144, 311.481999874115]
+onTime = [556.2530000209808, 487.96399998664856, 534.5510001182556]
