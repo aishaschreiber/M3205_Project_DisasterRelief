@@ -1,23 +1,16 @@
 from gurobipy import *
 import access_data_edit
 
-
-# import sys
-# import os
-# # Add a new directory to the Python path
-# new_directory = 'D:/UQ/2023 Semester2/MATH3205/Project/Program/M3205_Project_DisasterRelief-main/M3205_Project_DisasterRelief-main'
-
-# os.chdir(new_directory)
-
-# # Verify the change by printing the current working directory
-# current_directory = os.getcwd()
-# print("Current working directory:", current_directory)
-
+# This file is wrapped in a verbose function. 
+# To run the benders loop, go to the BOTTOM OF THE FILE and ensure you have selected your desired instance
+# Here you can decide whether you want to print the outputs (by setting verbose to True)
+# Then run the whole file
 
 def BendersLazy(instance: str, verbose: bool = True) -> dict:
 
     GET = access_data_edit.get_data_sets(instance)
-    # SETS
+    # SETS: defined using the access file that loads in the instances
+    
     # Set of temporary facility locations (aka 'I' in the paper)
     TF = GET['TF']
     # Set of permanent facility (PF) locations J (aka 'J' in the paper)
@@ -114,12 +107,15 @@ def BendersLazy(instance: str, verbose: bool = True) -> dict:
                                     >=quicksum(D_sml[(s,m,l)]
                         for m in M_s[s] if (s,m,l) in D_sml))
                                     for s in S for l in L}
+    
     ##########################
     #End of Master Problem
 
 
-
-    ########FUNCTIONS FOR MAKING NEW SETS#########################
+    #######################################
+    #### FUNCTIONS FOR MAKING NEW SETS ####
+    #######################################
+    
     def AvailableTF(Y):
         avail_TFs = {}
         for s in S:
@@ -138,12 +134,14 @@ def BendersLazy(instance: str, verbose: bool = True) -> dict:
             closed_TFs[s] = tfs
         return avail_TFs, closed_TFs
 
-    ########BENDERS DECOMPOSITION#############
-    ########CALLBACK FUNCTION##############
+    
+    ######## BENDERS DECOMPOSITION #############
+    
+    ######## CALLBACK FUNCTION ##############
     #- Callback Function doesnt like other calling other functions outside itself, so we are going to define the sets in the loop
     #- When defining them in a loop, used for b in S instead of for s in S to avoid violating the outter loop
     #Problems:
-        #1. Do we need cbGetSolution for the Subproblems? Cuz 
+        #1. Do we need cbGetSolution for the Subproblems? 
 
     def Callback(model, where):
         if where == GRB.Callback.MIPSOL:
@@ -451,7 +449,12 @@ def BendersLazy(instance: str, verbose: bool = True) -> dict:
     return {"ObjectiveValue": LIPMP.objVal, "OpenedPFs": openedPF, "Time": LIPMP.Runtime}
 
 
-# This is what runs when you click play
+    ###################################
+    ####### End of Benders Loop #######
+    ###################################
+    
+#########################################
+# This is what runs when you click play #
 if __name__ == "__main__":
     default_instance = "CLFDIP Model Data Generation Tool/Instances (Sets and Parameters)/Pr01_S2.txt"
     dictionary = BendersLazy(default_instance, verbose=True)
