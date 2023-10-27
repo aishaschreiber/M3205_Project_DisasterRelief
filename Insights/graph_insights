@@ -1,0 +1,88 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def comparisonGraph() -> None:
+    """
+    This function creates a side-by-side bar plot comparing the time taken by Simplex and Benders algorithms to solve
+    instances with different number of scenarios. The function takes no arguments and returns nothing, but displays
+    the plot using Matplotlib's `show()` function.
+    """
+    Simpletime = [132.2869999408722, 205.7630000114441, 1071.6169998645782]
+    Benderstime = [8.541000127792358, 16.95799994468689, 14.733000040054321]
+
+    # Round the times to 1 decimal place
+    Simpletime = [round(x, 1) for x in Simpletime]
+    Benderstime = [round(x, 1) for x in Benderstime]
+
+    # Make a side by side bar plot
+    plt.bar(np.arange(len(Simpletime)), Simpletime, width=0.25, align='center', label='Simplex')
+    plt.bar(np.arange(len(Benderstime))+0.25, Benderstime, width=0.25, align='center', label='Benders')
+    plt.xticks(np.arange(len(Simpletime))+0.125, ['Two', 'Three', 'Four'])
+    # label the bars
+    for i in range(len(Simpletime)):
+        plt.text(i, Simpletime[i]+10, str(Simpletime[i]), ha='center')
+        plt.text(i+0.25, Benderstime[i]+10, str(Benderstime[i]), ha='center')
+
+    plt.ylabel('Time (seconds)')
+    plt.xlabel('Number of Scenarios in Instance')
+    plt.title('Figure 3: Comparison of Simplex and Benders Times')
+    plt.legend(loc='upper left')
+
+    # save the plot
+    plt.savefig('comparison.png')
+
+    plt.show()
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def validCutsGraph() -> None:
+    """
+    Generates a side-by-side bar plot comparing the change in time when turning on and off valid inequalities.
+
+    Returns:
+    None
+    """
+    Alloff = 1405.289999961853
+    AllOn = 156.45499992370605
+
+
+    names = ["Constraint 15", "Constraint 16", "Constraint 17"]
+    offTime = [263.4579999446869, 346.16100001335144, 311.481999874115]
+    onTime = [556.2530000209808, 487.96399998664856, 534.5510001182556]
+
+    # calculate the change in time when turning on the valid inequalities
+    changeOn = [Alloff - onTime[i] for i in range(len(offTime))]
+    # calculate the change in time when turning off the valid inequalities
+    changeOff = [AllOn - offTime[i] for i in range(len(onTime))]
+
+    # Round the times to 1 decimal place
+    changeOn = [-round(x, 1) for x in changeOn]
+    changeOff = [-round(x, 1) for x in changeOff]
+
+    # Make a side by side bar plot
+    plt.bar(np.arange(len(changeOn)), changeOn, width=0.25, align='center', label='Turned On')
+    plt.bar(np.arange(len(changeOff))+0.25, changeOff, width=0.25, align='center', label='Turned Off')
+    plt.xticks(np.arange(len(changeOn))+0.125, names)
+    # label the bars
+    for i in range(len(changeOn)):
+        plt.text(i, changeOn[i]+10, str(changeOn[i]), ha='center')
+        plt.text(i+0.25, changeOff[i]+10, str(changeOff[i]), ha='center')
+
+    plt.ylabel('Change in Time (seconds)')
+    plt.xlabel('Valid Inequality')
+    plt.title('Figure 2: Comparison of Valid Inequalities')
+    plt.legend(loc='upper left')
+
+    # save the plot
+    plt.savefig('validCuts.png')
+
+    plt.show()
+
+    
+
+if __name__ == '__main__':
+    comparisonGraph()

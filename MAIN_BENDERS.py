@@ -6,7 +6,23 @@ import access_data_edit
 # Here you can decide whether you want to print the outputs (by setting verbose to True)
 # Then run the whole file
 
+
 def BendersLazy(instance: str, verbose: bool = True) -> dict:
+    """
+    This function implements the Benders' decomposition algorithm for solving the Disaster Relief Problem. 
+
+    Parameters:
+    - instance (str): the name of the instance file to be loaded
+    - verbose (bool): a flag to indicate whether to print the optimization process or not. Default is True.
+
+    Returns:
+    - A dictionary containing the optimal objective value and the optimal solution and runtime.
+
+    The function first loads the data sets from the instance file using the access_data_edit.get_data_sets() function. 
+    It then defines the master problem variables, objective function, and constraints. 
+    The function also defines a callback function that solves the clustering and flow distribution subproblems. 
+    The function returns the optimal objective value and solution as a dictionary.
+    """   
 
     GET = access_data_edit.get_data_sets(instance)
     # SETS: defined using the access file that loads in the instances
@@ -114,7 +130,14 @@ def BendersLazy(instance: str, verbose: bool = True) -> dict:
     ###################################################################
     # This function is used in the sub-problems to define some new sets
     
-    def AvailableTF(Y):
+    def AvailableTF(Y) -> (dict, dict):
+        """
+        Helper function
+        Returns two dictionaries: `avail_TFs` and `closed_TFs`.
+
+        `avail_TFs` contains the available transportation facilities for each site `s` in `S`.
+        `closed_TFs` contains the closed transportation facilities for each site `s` in `S`.
+        """
         avail_TFs = {}
         for s in S:
             available_tfs = []
@@ -138,6 +161,14 @@ def BendersLazy(instance: str, verbose: bool = True) -> dict:
     # The Benders Loop is defined in a Callback function
 
     def Callback(model, where):
+        """
+        This function is a callback function that is called by the Gurobi solver when a new integer feasible solution is found.
+        It solves the clustering subproblem and adds cuts to the master problem if the clustering subproblem is infeasible.
+        The function takes two arguments:
+        - model: the Gurobi model object
+        - where: an integer indicating the location in the optimization process where the callback function was called
+        """
+        
         if where == GRB.Callback.MIPSOL:
             YV = LIPMP.cbGetSolution(Y)
             IV = LIPMP.cbGetSolution(I)

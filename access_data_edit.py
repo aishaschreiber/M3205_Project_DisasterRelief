@@ -1,7 +1,5 @@
 import csv
 
-
-
 def get_data_sets(instance : str):
 
     complete_data = []
